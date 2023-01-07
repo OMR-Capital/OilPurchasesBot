@@ -2,9 +2,10 @@ from odetam import DetaModel
 
 
 class Purchase(DetaModel):
-    employee_id: int
+    employee_key: str
     supplier: str
     amount: str
     price: str
     card: str
-    active: bool
+    approved: bool
+    approver_id: str
