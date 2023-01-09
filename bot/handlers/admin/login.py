@@ -2,7 +2,7 @@ from os import getenv
 
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot import messages
 from bot.callbacks.admin import AdminLoginData
@@ -54,4 +54,9 @@ async def login(message: Message, state: FSMContext):
     admin.save()
 
     await state.clear()
-    await message.answer(messages.SUCCESSFUL_ADMIN_LOGIN)
+    await message.answer(
+        messages.SUCCESSFUL_ADMIN_LOGIN,
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text='История закупок', callback_data='test')]
+        ])
+    )

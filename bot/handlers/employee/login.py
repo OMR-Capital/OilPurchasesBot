@@ -1,6 +1,6 @@
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot import messages
 from bot.callbacks.employee import EmployeeLoginData
@@ -41,4 +41,10 @@ async def login(message: Message, state: FSMContext):
     employee.save()
 
     await state.clear()
-    await message.answer(messages.SUCCESSFUL_EMPLOYEE_LOGIN)
+    await message.answer(
+        messages.SUCCESSFUL_EMPLOYEE_LOGIN,
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text='История закупок', callback_data='test')],
+            [InlineKeyboardButton(text='Добавить закупку', callback_data='test')],
+        ])
+    )
