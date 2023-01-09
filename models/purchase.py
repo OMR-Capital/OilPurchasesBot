@@ -1,11 +1,14 @@
+from datetime import datetime
 from odetam import DetaModel
 
 
 class Purchase(DetaModel):
-    employee_key: str
     supplier: str
     amount: str
     price: str
     card: str
     approved: bool
-    approver_id: str
+    approved_by: str
+    approve_date: datetime
+    created_by: str
+    create_date: datetime

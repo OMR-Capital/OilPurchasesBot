@@ -2,5 +2,6 @@ from odetam import DetaModel
 
 
 class User(DetaModel):
-    name: str
+    chat_id: str
     is_admin: bool
+    name: str
