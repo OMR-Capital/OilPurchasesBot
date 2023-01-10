@@ -18,3 +18,4 @@ async def start_handler(message: Message, state: FSMContext):
             [InlineKeyboardButton(text='Войти', callback_data=LoginCallback().pack())]
         ])
     )
+    await message.delete()
