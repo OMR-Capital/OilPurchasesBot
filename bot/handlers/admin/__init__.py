@@ -1,6 +1,5 @@
 from aiogram import Router
 
-from . import login
+from . greeting import greet
 
 router = Router()
-router.include_router(login.router)

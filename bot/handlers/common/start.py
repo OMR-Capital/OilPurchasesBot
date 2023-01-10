@@ -4,8 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from bot import messages
-from bot.callbacks.admin import AdminLoginData
-from bot.callbacks.employee import EmployeeLoginData
+from bot.callbacks.common import LoginCallback
 
 router = Router()
 
@@ -16,7 +15,6 @@ async def start_handler(message: Message, state: FSMContext):
     await message.answer(
         messages.START,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='Администратор', callback_data=AdminLoginData().pack())],
-            [InlineKeyboardButton(text='Работник', callback_data=EmployeeLoginData().pack())],
+            [InlineKeyboardButton(text='Войти', callback_data=LoginCallback().pack())]
         ])
     )

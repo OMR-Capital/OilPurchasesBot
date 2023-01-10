@@ -1,7 +1,9 @@
+from typing import Literal
 from odetam import DetaModel
 
 
 class User(DetaModel):
-    chat_id: str
-    is_admin: bool
+    access_key: str
+    mode: Literal['superuser', 'admin', 'employee']
     name: str
+    chat_id: int
