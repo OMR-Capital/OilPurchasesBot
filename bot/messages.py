@@ -19,4 +19,13 @@ SUCCESSFUL_CREATE_USER = '''
 Ключ: {access_key}
 '''
 
+USER_INFO = '''
+Имя: {name}
+Статус: {mode}
+Ключ: {access_key}
+'''
+
+ACCOUNTS_LIST = 'Нажмите на пользователя, чтобы посмотреть данные и статистику или удалить.'
+SUCCESSFUL_DELETE_USER = 'Пользователь успешно удален.'
+
 TEST='TEST'

@@ -19,3 +19,11 @@ class NewEmployeeCallback(CallbackData, prefix='superuser.accounts.new_employee'
 
 class AccountsListCallback(CallbackData, prefix='superuser.accounts.accounts_list'):
     pass
+
+
+class UserInfoCallback(CallbackData, prefix='superuser.accounts.user_info'):
+    key: str
+
+
+class RemoveUserCallback(CallbackData, prefix='superuser.accounts.remove_user'):
+    key: str
