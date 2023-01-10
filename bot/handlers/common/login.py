@@ -30,19 +30,19 @@ async def access_key_handler(message: Message, state: FSMContext):
 
     if len(result) == 0:
         await message.answer(messages.WRONG_ACCESS_KEY)
-    elif len(result) == 1:
-        user = result.pop()
-        user.chat_id = message.chat.id
-        user.save()
+        return 
+        
+    user = result.pop()
+    user.chat_id = message.chat.id
+    user.save()
 
-        if user.mode == 'superuser':
-            await superuser.greet(message, user)
-        elif user.mode == 'admin':
-            await admin.greet(message, user)
-        elif user.mode == 'employee':
-            await employee.greet(message, user)
+    if user.mode == 'superuser':
+        await superuser.greet(message, user)
+    elif user.mode == 'admin':
+        await admin.greet(message, user)
+    elif user.mode == 'employee':
+        await employee.greet(message, user)
 
-        await state.clear()
-    else:
-        raise Exception('User chat_id duplicate')
+    await state.clear()
+    
     
