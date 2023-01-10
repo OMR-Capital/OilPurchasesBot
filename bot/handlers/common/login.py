@@ -13,7 +13,7 @@ router = Router()
 
 @router.callback_query(LoginCallback.filter())
 async def login_handler(query: CallbackQuery, state: FSMContext):
-    await query.answer()
+    await query.answer()  
 
     message = query.message
     if not message:

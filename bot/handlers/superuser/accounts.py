@@ -3,7 +3,9 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
                            InlineKeyboardMarkup, Message)
 
 from bot import messages
-from bot.callbacks.superuser import AccountsCallback, MainPageCallback
+from bot.callbacks.superuser import (AccountsCallback, AccountsListCallback,
+                                     MainPageCallback, NewAdminCallback,
+                                     NewEmployeeCallback)
 
 router = Router()
 
@@ -24,11 +26,11 @@ async def open_accounts(message: Message):
         messages.ACCOUNTS,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [
-                InlineKeyboardButton(text='Новый Админ', callback_data='test'), 
-                InlineKeyboardButton(text='Новый Работник', callback_data='test')
+                InlineKeyboardButton(text='Новый Админ', callback_data=NewAdminCallback().pack()), 
+                InlineKeyboardButton(text='Новый Работник', callback_data=NewEmployeeCallback().pack())
             ],
             [
-                InlineKeyboardButton(text='Список аккаунтов', callback_data='test'), 
+                InlineKeyboardButton(text='Список аккаунтов', callback_data=AccountsListCallback().pack()), 
             ],
             [
                 InlineKeyboardButton(text='Назад', callback_data=MainPageCallback().pack()), 

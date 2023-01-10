@@ -21,5 +21,9 @@ async def webhook_route(
         raise HTTPException(detail='Invalid secret',
                             status_code=status.HTTP_401_UNAUTHORIZED)
 
-    response = await dispatcher.feed_update(bot, update=update)
+    try:
+        response = await dispatcher.feed_update(bot, update=update)
+    except Exception as e:
+        response = str(e)
+        
     return {'ok': True, 'response': response}

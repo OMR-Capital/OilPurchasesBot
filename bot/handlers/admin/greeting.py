@@ -8,7 +8,7 @@ from .main_page import open_main_page
 
 async def greet(message: Message, user: User):
     await message.answer(
-        messages.SUCCESSFUL_ADMIN_LOGIN.format(fullname=user.name)
+        messages.SUCCESSFUL_ADMIN_LOGIN.format(name=user.name)
     )
     msg = await message.answer(messages.LOAD_PAGE)
     await msg.pin(disable_notification=True)
