@@ -46,7 +46,7 @@ async def spread_purchase(purchase: Purchase, creator: User):
                 admin.chat_id or 0,
                 messages.PURCHASE.format(
                     creator=creator.name,
-                    time=purchase.create_time.isoformat(timespec='minutes'),
+                    time=purchase.create_time.isoformat(sep=' ', timespec='minutes'),
                     supplier=purchase.supplier,
                     amount=purchase.amount,
                     price=purchase.price,

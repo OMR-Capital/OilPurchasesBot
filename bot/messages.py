@@ -41,7 +41,7 @@ PURCHASE = '''
 Объем: {amount}
 Цена: {price}
 Счет для оплаты: 
-{card}
+<code>{card}</code>
 '''
 
 SUCCESSFUL_CREATE_PURCHASE = '''
@@ -52,7 +52,7 @@ SUCCESSFUL_CREATE_PURCHASE = '''
 Объем: {amount}
 Цена: {price}
 Счет для оплаты: 
-{card}
+<code>{card}</code>
 '''
 
 ERROR = 'Произошла какая-то ошибка. Попробуйте снова.'
