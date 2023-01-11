@@ -1,6 +1,7 @@
 from typing import Optional
 
 from aiogram import Bot
+from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, Message
 
 
@@ -29,3 +30,8 @@ async def edit_message(
         )
     
     return msg if isinstance(msg, Message) else None
+
+
+async def get_init_message_id(state: FSMContext) -> Optional[int]:
+    data = await state.get_data()
+    return data.get('init_message_id')

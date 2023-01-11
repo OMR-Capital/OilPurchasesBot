@@ -1,14 +1,14 @@
 from random import choices
 from string import ascii_lowercase, digits
-from typing import Optional
 
-from aiogram import F, Router, Bot
+from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import (CallbackQuery, InlineKeyboardButton,
                            InlineKeyboardMarkup, Message)
 
 from bot import messages
 from bot.callbacks.superuser import AccountsCallback, NewAdminCallback
+from bot.handlers.utils import edit_message, get_init_message_id
 from bot.states.superuser import NewAdminState
 from models import User
 
@@ -35,8 +35,7 @@ async def new_admin_handler(query: CallbackQuery, state: FSMContext):
 
 @router.message(NewAdminState.name, F.text)
 async def name_handler(message: Message, state: FSMContext):
-    data = await state.get_data()
-    init_message_id: Optional[Message] = data.get('init_message_id')
+    await message.delete()
 
     name = message.text or ''
     access_key = ''.join(choices(ascii_lowercase + digits, k=6))
@@ -48,13 +47,11 @@ async def name_handler(message: Message, state: FSMContext):
     )
     new_admin.save()
 
-    await message.delete()
-
-    bot = Bot.get_current()
-    if init_message_id is None or bot is None:
+    init_message_id = await get_init_message_id(state)
+    if not init_message_id:
         return
 
-    await bot.edit_message_text(
+    await edit_message(
         chat_id=message.chat.id,
         message_id=init_message_id,
         text=messages.SUCCESSFUL_CREATE_USER.format(
