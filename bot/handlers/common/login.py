@@ -33,15 +33,11 @@ async def access_key_handler(message: Message, state: FSMContext):
     if not init_message_id:
         return
 
-    access_key = message.text 
-    result = User.query(User.access_key == access_key) # type: ignore
-    if len(result) == 0:
+    access_key = message.text or ''
+    user = User.login_user(access_key, message.chat.id)
+    if not user:
         await edit_message(message.chat.id, init_message_id, messages.WRONG_ACCESS_KEY)
-        return 
-        
-    user = result.pop()
-    user.chat_id = message.chat.id
-    user.save()
+        return
 
     if user.mode == 'superuser':
         await superuser.greet(message.chat.id, init_message_id, user)

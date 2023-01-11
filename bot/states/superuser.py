@@ -1,9 +1,6 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
-class NewAdminState(StatesGroup):
+class NewUserState(StatesGroup):
     name = State()
 
-
-class NewEmployeeState(StatesGroup):
-    name = State()

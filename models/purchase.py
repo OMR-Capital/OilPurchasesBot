@@ -12,3 +12,7 @@ class Purchase(DetaModel):
     approve_date: datetime
     creator_key: str
     create_date: datetime
+
+    class Config:
+        table_name = 'purchases'
+        

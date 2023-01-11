@@ -47,4 +47,6 @@ SUCCESSFUL_CREATE_PURCHASE = '''
 
 ''' + PURCHASE
 
+ERROR = 'Произошла какая-то ошибка. Попробуйте снова.'
+
 TEST='TEST'
