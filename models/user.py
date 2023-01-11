@@ -8,7 +8,7 @@ from odetam import DetaModel
 class User(DetaModel):
     access_key: str
     name: str
-    mode: Literal['superuser', 'admin', 'employee']
+    mode: str
     chat_id: Optional[int]
 
     class Config:

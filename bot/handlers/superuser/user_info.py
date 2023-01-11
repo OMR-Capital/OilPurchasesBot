@@ -3,9 +3,11 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import (CallbackQuery, InlineKeyboardButton,
                            InlineKeyboardMarkup)
 
-from bot.callbacks.superuser import AccountsListCallback, UserInfoCallback, RemoveUserCallback
 from bot import messages
+from bot.callbacks.superuser import (AccountsListCallback, RemoveUserCallback,
+                                     UserInfoCallback)
 from models import User
+from odetam.exceptions import ItemNotFound
 
 router = Router()
 
@@ -19,10 +21,11 @@ async def accounts_list_handler(query: CallbackQuery, callback_data: UserInfoCal
     if not message:
         return
 
-    user = User.get(callback_data.key) # type: ignore
-    if not user:
+    try:
+        user = User.get(callback_data.key) # type: ignore
+    except ItemNotFound:
         return
-
+    
     await message.edit_text(
         text=messages.USER_INFO.format(
             name=user.name,

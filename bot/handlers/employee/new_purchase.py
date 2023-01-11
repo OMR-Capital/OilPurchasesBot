@@ -5,7 +5,9 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
 
 from bot import messages
 from bot.callbacks.employee import MainPageCallback, NewPurchaseCallback
+from bot.handlers.common.error import error
 from bot.handlers.utils import edit_message, get_init_message_id
+from bot.handlers.utils.purchases import new_purchase
 from bot.states.employee import NewPurchaseState
 
 router = Router()
@@ -84,23 +86,31 @@ async def price_handler(message: Message, state: FSMContext):
 @router.message(NewPurchaseState.card, F.text)
 async def card_handler(message: Message, state: FSMContext):
     await message.delete()
-    
+
     init_message_id = await get_init_message_id(state)
     if not init_message_id:
         return
 
-    data = await state.get_data()
+    card = message.text or ''
+    await state.update_data(card=card)
+
+    purchase = await new_purchase(message, state)
+    if purchase is None:
+        await error(message.chat.id, init_message_id, MainPageCallback().pack())
+        return
+
     await edit_message(
         message.chat.id, 
         init_message_id, 
         messages.SUCCESSFUL_CREATE_PURCHASE.format(
-            supplier=data['supplier'],
-            amount=data['amount'],
-            price=data['price'],
-            card=message.text,
+            supplier=purchase.supplier,
+            amount=purchase.amount,
+            price=purchase.price,
+            card=purchase.card,
         ),
         InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text='Назад', callback_data=MainPageCallback().pack())]
         ])
     )
+    await state.clear()
     
