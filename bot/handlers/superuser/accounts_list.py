@@ -14,7 +14,7 @@ router = Router()
 async def accounts_list_handler(query: CallbackQuery, state: FSMContext):
     await query.answer()
     await state.clear()
-    
+
     message = query.message
     if not message:
         return
@@ -35,7 +35,7 @@ def build_users_list_kb(users: list[User]) -> InlineKeyboardMarkup:
         [
             InlineKeyboardButton(
                 text=user.name, 
-                callback_data=UserInfoCallback(key=user.key).pack()
+                callback_data=UserInfoCallback(key=user.key).pack() # type: ignore
             )
         ] for user in users
     ]

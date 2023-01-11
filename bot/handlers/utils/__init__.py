@@ -28,7 +28,7 @@ async def edit_message(
             text=text,
             reply_markup=reply_markup
         )
-    
+
     return msg if isinstance(msg, Message) else None
 
 

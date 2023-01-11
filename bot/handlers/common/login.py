@@ -5,7 +5,7 @@ from aiogram.types import CallbackQuery, Message
 from bot import messages
 from bot.callbacks.common import LoginCallback
 from bot.handlers import admin, employee, superuser
-from bot.handlers.utils import edit_message
+from bot.handlers.utils import edit_message, get_init_message_id
 from bot.states.common import LoginState
 from models import User
 
@@ -29,8 +29,7 @@ async def login_handler(query: CallbackQuery, state: FSMContext):
 async def access_key_handler(message: Message, state: FSMContext):
     await message.delete()
 
-    data = await state.get_data()
-    init_message_id = data.get('init_message_id')
+    init_message_id = await get_init_message_id(state)
     if not init_message_id:
         return
 
