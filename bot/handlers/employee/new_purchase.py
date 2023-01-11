@@ -5,7 +5,7 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
 
 from bot import messages
 from bot.callbacks.employee import MainPageCallback, NewPurchaseCallback
-from bot.handlers.common.error import error
+from bot.handlers.utils.chat import error
 from bot.handlers.utils import edit_message, get_init_message_id
 from bot.handlers.utils.purchases import new_purchase
 from bot.states.employee import NewPurchaseState

@@ -6,7 +6,7 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
 from bot import messages
 from bot.callbacks.superuser import (AccountsCallback, NewAdminCallback,
                                      NewEmployeeCallback)
-from bot.handlers.common.error import error
+from bot.handlers.utils.chat import error
 from bot.handlers.utils import edit_message, get_init_message_id
 from bot.states.superuser import NewUserState
 from models import User
