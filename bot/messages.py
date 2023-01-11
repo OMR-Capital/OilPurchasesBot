@@ -55,6 +55,17 @@ SUCCESSFUL_CREATE_PURCHASE = '''
 <code>{card}</code>
 '''
 
+PURCHASE_APPROVED = '''
+Заявка подтверждена.
+Администратор: {approver}
+
+Поставщик: {supplier}
+Объем: {amount}
+Цена: {price}
+Счет для оплаты: 
+<code>{card}</code>
+'''
+
 ERROR = 'Произошла какая-то ошибка. Попробуйте снова.'
 
 TEST='TEST'

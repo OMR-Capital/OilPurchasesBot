@@ -7,3 +7,7 @@ class MainPageCallback(CallbackData, prefix='employee.main_page'):
 
 class NewPurchaseCallback(CallbackData, prefix='employee.new_purchase'):
     pass
+
+
+class HidePurchaseCallback(CallbackData, prefix='employee.hide_purchase'):
+    pass
