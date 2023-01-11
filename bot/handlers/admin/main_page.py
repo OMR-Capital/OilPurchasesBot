@@ -24,7 +24,7 @@ async def open_main_page(message: Message):
     await message.edit_text(
         messages.MAIN_PAGE,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='Статистика закупок', callback_data='test')]
+            [InlineKeyboardButton(text='Статистика', callback_data='test')]
         ])
     )
 

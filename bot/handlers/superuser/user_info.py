@@ -33,7 +33,6 @@ async def accounts_list_handler(query: CallbackQuery, callback_data: UserInfoCal
             access_key=user.access_key
         ),
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='История закупок', callback_data='test')],
             [
                 InlineKeyboardButton(
                     text='❌ Удалить ❌', 

@@ -25,7 +25,7 @@ async def open_main_page(message: Message):
         messages.MAIN_PAGE,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text='Управление аккаунтами', callback_data=AccountsCallback().pack())],
-            [InlineKeyboardButton(text='Статистика закупок', callback_data='test')],
+            [InlineKeyboardButton(text='Статистика', callback_data='test')],
         ])
     )
 
