@@ -1,5 +1,5 @@
 from bot import messages
-from bot.handlers.utils import edit_message
+from bot.handlers.utils.chat import edit_message
 from models import User
 
 from .main_page import open_main_page

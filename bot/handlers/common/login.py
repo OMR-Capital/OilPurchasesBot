@@ -5,7 +5,7 @@ from aiogram.types import CallbackQuery, Message
 from bot import messages
 from bot.callbacks.common import LoginCallback
 from bot.handlers import admin, employee, superuser
-from bot.handlers.utils import edit_message, get_init_message_id
+from bot.handlers.utils.chat import edit_message, get_init_message_id
 from bot.states.common import LoginState
 from models import User
 

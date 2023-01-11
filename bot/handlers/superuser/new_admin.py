@@ -8,7 +8,7 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
 
 from bot import messages
 from bot.callbacks.superuser import AccountsCallback, NewAdminCallback
-from bot.handlers.utils import edit_message, get_init_message_id
+from bot.handlers.utils.chat import edit_message, get_init_message_id
 from bot.states.superuser import NewAdminState
 from models import User
 

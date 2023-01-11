@@ -8,7 +8,7 @@ class Purchase(DetaModel):
     price: str
     card: str
     approved: bool
-    approved_by: str
+    approver_key: str
     approve_date: datetime
-    created_by: str
+    creator_key: str
     create_date: datetime
