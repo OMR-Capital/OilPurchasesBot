@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from odetam import DetaModel
 
 
@@ -8,10 +9,10 @@ class Purchase(DetaModel):
     price: str
     card: str
     approved: bool
-    approver_key: str
-    approve_date: datetime
-    creator_key: str
-    create_date: datetime
+    approver: Optional[str]
+    approve_time: Optional[datetime]
+    creator: str
+    create_time: datetime
 
     class Config:
         table_name = 'purchases'

@@ -1,7 +1,6 @@
 from random import choices, choice
 from string import ascii_lowercase, digits
 from typing import Literal, Optional
-from models.chat import Chat
 
 from odetam import DetaModel
 
@@ -10,6 +9,7 @@ class User(DetaModel):
     access_key: str
     name: str
     mode: Literal['superuser', 'admin', 'employee']
+    chat_id: Optional[int]
 
     class Config:
         table_name = 'users'
@@ -28,11 +28,12 @@ class User(DetaModel):
 
     @classmethod
     def login_user(cls, access_key: str, chat_id: int) -> Optional['User']:
-        result = User.query(User.access_key == access_key)
+        result = User.query(User.access_key == access_key) # type: ignore
 
         if result:
             user = result.pop()
-            Chat(key=chat_id, user=user.key)
+            user.chat_id = chat_id
+            user.save()
             return user
         
         return None
