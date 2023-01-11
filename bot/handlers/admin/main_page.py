@@ -1,4 +1,5 @@
 from aiogram import Router
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.callbacks.employee import MainPageCallback
@@ -8,9 +9,10 @@ router = Router()
 
 
 @router.callback_query(MainPageCallback.filter())
-async def main_page_handler(query: CallbackQuery):
+async def main_page_handler(query: CallbackQuery, state: FSMContext):
     await query.answer()
-
+    await state.clear()
+    
     message = query.message
     if not message:
         return
