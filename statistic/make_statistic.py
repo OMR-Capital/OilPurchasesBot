@@ -4,19 +4,20 @@ from odetam.exceptions import ItemNotFound
 
 TABLE_HEAD = [
     'Номер',
+    'Время создания',
+    'Создатель заявки',
     'Поставщик',
     'Объем',
     'Цена',
     'Счет оплаты',
-    'Создатель заявки',
-    'Время создания',
-    'Одобривший заявку',
     'Время одобрения'
+    'Одобривший заявку',
 ]
 
 
 def make_statistic() -> list[list[str]]:
     purchases = Purchase.get_all()
+    purchases.sort(key=lambda purchase: purchase.create_time, reverse=True)
 
     statistic_data = [TABLE_HEAD]
     for purchase in purchases:
@@ -37,14 +38,14 @@ def make_statistic() -> list[list[str]]:
 
         statistic_data.append([
             purchase.key or '',
+            purchase.create_time.isoformat(' ', 'minutes'),
+            creator_name,
             purchase.supplier,
             purchase.amount,
             purchase.price,
             purchase.card,
-            creator_name,
-            purchase.create_time.isoformat(' ', 'minutes'),
+            purchase.approve_time.isoformat(' ', 'minutes') if purchase.approve_time else '',
             approver_name,
-            purchase.approve_time.isoformat(' ', 'minutes') if purchase.approve_time else ''
         ])
     
     return statistic_data

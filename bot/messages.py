@@ -23,7 +23,7 @@ SUCCESSFUL_CREATE_USER = '''
 USER_INFO = '''
 Имя: {name}
 Статус: {mode}
-Ключ: {access_key}
+Ключ: <code>{access_key}</code>
 '''
 
 ACCOUNTS_LIST = 'Нажмите на пользователя, чтобы посмотреть данные и статистику или удалить.'
