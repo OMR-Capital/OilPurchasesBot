@@ -1,9 +1,11 @@
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import (CallbackQuery, InlineKeyboardButton,
+                           InlineKeyboardMarkup, Message)
 
-from bot.callbacks.superuser import MainPageCallback, AccountsCallback
 from bot import messages
+from bot.callbacks.admin import StatisticCallback
+from bot.callbacks.superuser import AccountsCallback, MainPageCallback
 
 router = Router()
 
@@ -25,7 +27,7 @@ async def open_main_page(message: Message):
         messages.MAIN_PAGE,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text='Управление аккаунтами', callback_data=AccountsCallback().pack())],
-            [InlineKeyboardButton(text='Статистика', callback_data='test')],
+            [InlineKeyboardButton(text='Статистика', callback_data=StatisticCallback().pack())],
         ])
     )
 

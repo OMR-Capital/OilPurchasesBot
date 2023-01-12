@@ -2,7 +2,7 @@ from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, InlineKeyboardButton, InlineKeyboardMarkup
 
-from bot.callbacks.admin import MainPageCallback
+from bot.callbacks.admin import MainPageCallback, StatisticCallback
 from bot import messages
 
 router = Router()
@@ -24,7 +24,7 @@ async def open_main_page(message: Message):
     await message.edit_text(
         messages.MAIN_PAGE,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='Статистика', callback_data='test')]
+            [InlineKeyboardButton(text='Статистика', callback_data=StatisticCallback().pack())]
         ])
     )
 

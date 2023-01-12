@@ -4,6 +4,8 @@
 # Typing
 pyrightconfig.json
 
+google-key.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

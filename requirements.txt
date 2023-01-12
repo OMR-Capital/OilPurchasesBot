@@ -20,3 +20,4 @@ yarl==1.8.2
 fastapi
 aiogram_deta
 deta[async]==1.1.0a2
+gspread

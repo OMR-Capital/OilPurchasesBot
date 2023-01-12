@@ -9,6 +9,7 @@ SUCCESSFUL_ADMIN_LOGIN = 'Здравствуйте, {name}! Вы успешно 
 SUCCESSFUL_EMPLOYEE_LOGIN = 'Здравствуйте, {name}! Вы успешно вошли в кабинет работника.'
 
 LOAD_PAGE = 'Загрузка меню'
+WAIT = 'Идет обработка...'
 MAIN_PAGE = 'Основное меню'
 
 ACCOUNTS = 'Управление аккаунтами'
@@ -65,6 +66,8 @@ PURCHASE_APPROVED = '''
 Счет для оплаты: 
 <code>{card}</code>
 '''
+
+SUCCESSFUL_MAKE_STATISTIC = 'Отчет успешно создан.'
 
 ERROR = 'Произошла какая-то ошибка. Попробуйте снова.'
 

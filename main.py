@@ -10,6 +10,7 @@ TELEGRAM_SECRET = getenv('TELEGRAM_SECRET', '')
 
 
 deta = Deta()
+
 bot = create_bot(token=BOT_TOKEN)
 dispatcher = create_dispatcher(deta=deta)
 app = create_app(
