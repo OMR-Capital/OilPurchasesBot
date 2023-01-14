@@ -4,7 +4,7 @@ from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, InlineKeyboardButton, InlineKeyboardMarkup
 
-from bot.callbacks.admin import MainPageCallback, StatisticCallback
+from bot.callbacks.admin import MainPageCallback
 from bot import messages
 
 router = Router()

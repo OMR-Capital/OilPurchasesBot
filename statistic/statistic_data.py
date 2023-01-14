@@ -1,6 +1,10 @@
+from datetime import timedelta, timezone
+
 from models import Purchase, User
 from odetam.exceptions import ItemNotFound
 
+
+TIMEZONE = timezone(timedelta(hours=3), name='Europe/Moscow')
 
 TABLE_HEAD = [
     'Номер',
@@ -37,17 +41,24 @@ def make_statistic() -> list[list[str]]:
         else:
             approver_name = ''
 
+        create_time = purchase.create_time.astimezone(TIMEZONE).isoformat(' ', 'minutes')
+
+        if purchase.approve_time:
+            approve_time = purchase.approve_time.astimezone(TIMEZONE).isoformat(' ', 'minutes')  
+        else:
+            approve_time = ''
+            
         statistic_data.append([
             purchase.key or '',
             purchase.contract_type,
-            purchase.create_time.isoformat(' ', 'minutes'),
+            create_time,
             creator_name,
             purchase.supplier,
             purchase.amount,
             purchase.price,
             purchase.card,
-            purchase.approve_time.isoformat(' ', 'minutes') if purchase.approve_time else '',
+            approve_time,
             approver_name,
         ])
-    
+
     return statistic_data

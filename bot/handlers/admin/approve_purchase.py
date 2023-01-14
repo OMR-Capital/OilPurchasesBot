@@ -3,7 +3,7 @@ from aiogram.types import CallbackQuery
 
 from bot.callbacks.admin import ApprovePurchaseCallback
 from bot.handlers.utils.purchases import approve_purchase
-from statistic import update_statistic_table, make_statistic
+from statistic import update_statistic
 
 router = Router()
 
@@ -17,4 +17,4 @@ async def approve_purchase_handler(query: CallbackQuery, callback_data: ApproveP
         return
 
     await approve_purchase(message, callback_data.purchase)
-    update_statistic_table(make_statistic())
+    update_statistic()

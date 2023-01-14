@@ -1,16 +1,18 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
-from bot.callbacks.employee import HidePurchaseCallback
-from models.spread import Spread
-from odetam.exceptions import ItemNotFound
 
 from bot import messages
 from bot.callbacks.admin import ApprovePurchaseCallback
+from bot.callbacks.employee import HidePurchaseCallback
 from models import Purchase, User
+from models.spread import Spread
+from odetam.exceptions import ItemNotFound
+
+TIMEZONE = timezone(timedelta(hours=3), name='Europe/Moscow')
 
 
 async def new_purchase(message: Message, state: FSMContext) -> Optional[Purchase]:
@@ -44,16 +46,18 @@ async def spread_purchase(purchase: Purchase, creator: User):
         return
 
     spread = Spread(purchase=purchase.key, messages=[])
-    admins = User.query((User.mode == 'admin') | (User.mode == 'superuser'))  # type: ignore
+    admins = User.query((User.mode == 'admin') | (
+        User.mode == 'superuser'))  # type: ignore
     for admin in admins:
         try:
+            create_time = purchase.create_time.astimezone(TIMEZONE)
+
             msg = await bot.send_message(
                 admin.chat_id or 0,
                 messages.PURCHASE_NOTIFICATION.format(
-                    contract_type=purchase.contract_type,
                     creator=creator.name,
-                    time=purchase.create_time.isoformat(
-                        sep=' ', timespec='minutes'),
+                    time=create_time.isoformat(sep=' ', timespec='minutes'),
+                    contract_type=purchase.contract_type,
                     supplier=purchase.supplier,
                     amount=purchase.amount,
                     price=purchase.price,
@@ -99,7 +103,7 @@ async def approve_purchase(message: Message, purchase_key: str) -> Optional[Purc
     bot = Bot.get_current()
     if not bot:
         return
-    
+
     try:
         creator = User.get(purchase.creator)
     except ItemNotFound:
@@ -138,6 +142,7 @@ async def approve_purchase(message: Message, purchase_key: str) -> Optional[Purc
             await bot.delete_message(chat_id, message_id)
         except:
             pass
-
+        
+    spread.delete()
     purchase.save()
     return purchase

@@ -1,5 +1,9 @@
 from .google_sheets import update_statistic_table
-from .make_statistic import make_statistic
+from .statistic_data import make_statistic
 
 
-__all__ = ['make_statistic', 'update_statistic_table']
+__all__ = ['update_statistic']
+
+
+def update_statistic():
+    update_statistic_table(make_statistic())

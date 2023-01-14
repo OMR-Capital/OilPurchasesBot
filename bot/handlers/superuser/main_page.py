@@ -6,7 +6,6 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
                            InlineKeyboardMarkup, Message)
 
 from bot import messages
-from bot.callbacks.admin import StatisticCallback
 from bot.callbacks.superuser import AccountsCallback, MainPageCallback
 
 router = Router()

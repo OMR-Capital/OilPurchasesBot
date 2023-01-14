@@ -8,6 +8,3 @@ class MainPageCallback(CallbackData, prefix='admin.main_page'):
 class ApprovePurchaseCallback(CallbackData, prefix='admin.approve_purchase'):
     purchase: str
 
-
-class StatisticCallback(CallbackData, prefix='admin.statistic'):
-    pass
