@@ -45,7 +45,7 @@ async def spread_purchase(purchase: Purchase, creator: User):
     if not bot:
         return
 
-    spread = Spread(purchase=purchase.key, messages=[])
+    spread = Spread(key=purchase.key, messages=[])
     admins = User.query((User.mode == 'admin') | (
         User.mode == 'superuser'))  # type: ignore
     for admin in admins:
@@ -132,17 +132,16 @@ async def approve_purchase(message: Message, purchase_key: str) -> Optional[Purc
     except:
         return
 
-    result = Spread.query(Spread.purchase == purchase.key)
-    if not result:
-        return purchase
+    try:
+        spread = Spread.get(purchase.key)
+        for chat_id, message_id in spread.messages:
+            try:
+                await bot.delete_message(chat_id, message_id)
+            except:
+                pass
+        spread.delete()
+    except ItemNotFound:
+        pass
 
-    spread = result.pop()
-    for chat_id, message_id in spread.messages:
-        try:
-            await bot.delete_message(chat_id, message_id)
-        except:
-            pass
-        
-    spread.delete()
     purchase.save()
     return purchase
