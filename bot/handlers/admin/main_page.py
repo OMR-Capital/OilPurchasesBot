@@ -1,3 +1,5 @@
+from os import getenv
+
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message, InlineKeyboardButton, InlineKeyboardMarkup
@@ -24,7 +26,7 @@ async def open_main_page(message: Message):
     await message.edit_text(
         messages.MAIN_PAGE,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='Статистика', callback_data=StatisticCallback().pack())]
+            [InlineKeyboardButton(text='Статистика', url=getenv('GOOGLE_TABLE_LINK', ''))]
         ])
     )
 
