@@ -4,6 +4,7 @@ from odetam import DetaModel
 
 
 class Purchase(DetaModel):
+    contract_type: str
     supplier: str
     amount: str
     price: str

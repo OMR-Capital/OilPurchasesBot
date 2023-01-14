@@ -13,12 +13,6 @@ WAIT = 'Идет обработка...'
 MAIN_PAGE = 'Основное меню'
 
 ACCOUNTS = 'Управление аккаунтами'
-SUCCESSFUL_CREATE_USER = '''
-Новый аккаунт добавлен.
-Имя: {name}
-Статус: {mode}
-Ключ: {access_key}
-'''
 
 USER_INFO = '''
 Имя: {name}
@@ -26,46 +20,46 @@ USER_INFO = '''
 Ключ: <code>{access_key}</code>
 '''
 
+SUCCESSFUL_CREATE_USER = '''
+Новый аккаунт добавлен.
+''' + USER_INFO
+
 ACCOUNTS_LIST = 'Нажмите на пользователя, чтобы посмотреть данные и статистику или удалить.'
 SUCCESSFUL_DELETE_USER = 'Пользователь успешно удален.'
 
-ASK_SUPPLIER = 'Укажите поставщика:'
-ASK_AMOUNT = 'Укажите объем закупки:'
-ASK_PRICE = 'Укажите цену:'
-ASK_CARD = 'Укажите счет оплаты:'
+ASK_SUPPLIER = 'Укажите наименование поставщика:'
+ASK_CONTRACT_TYPE = 'Выберите тип договора:'
+ASK_AMOUNT = 'Укажите объем вывезенного масла в литра:'
+ASK_PRICE = 'Укажите цену за литр:'
+ASK_CARD = 'Укажите реквизиты для оплаты:'
 
-PURCHASE = '''
+
+PURCHASE_BASE=''' 
+Тип договора: {contract_type}
+Поставщик: {supplier}
+Объем (литров): {amount}
+Цена (за литр): {price}
+Реквизиты для оплаты: 
+<code>{card}</code>
+'''
+
+PURCHASE_NOTIFICATION = '''
 Отправитель: {creator}
 Время: {time}
 
-Поставщик: {supplier}
-Объем: {amount}
-Цена: {price}
-Счет для оплаты: 
-<code>{card}</code>
-'''
+''' + PURCHASE_BASE
 
 SUCCESSFUL_CREATE_PURCHASE = '''
 Запись успешно создана и отправлена администраторам.
 Вы получите сообщение, как только они ее подтвердят.
 
-Поставщик: {supplier}
-Объем: {amount}
-Цена: {price}
-Счет для оплаты: 
-<code>{card}</code>
-'''
+''' + PURCHASE_BASE
 
 PURCHASE_APPROVED = '''
 Заявка подтверждена.
 Администратор: {approver}
 
-Поставщик: {supplier}
-Объем: {amount}
-Цена: {price}
-Счет для оплаты: 
-<code>{card}</code>
-'''
+''' + PURCHASE_BASE
 
 SUCCESSFUL_MAKE_STATISTIC = 'Отчет успешно создан.'
 

@@ -4,16 +4,18 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
                            InlineKeyboardMarkup, Message)
 
 from bot import messages
-from bot.callbacks.employee import MainPageCallback, NewPurchaseCallback
-from bot.handlers.utils.chat import error
+from bot.callbacks.employee import ContractTypeCallback, MainPageCallback, NewPurchaseCallback
 from bot.handlers.utils import edit_message, get_init_message_id
+from bot.handlers.utils.chat import error
 from bot.handlers.utils.purchases import new_purchase
 from bot.states.employee import NewPurchaseState
+from statistic import make_statistic, update_statistic_table
 
 router = Router()
 
 cancel_kb = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='Отмена', callback_data=MainPageCallback().pack())]
+    [InlineKeyboardButton(
+        text='Отмена', callback_data=MainPageCallback().pack())]
 ])
 
 
@@ -26,10 +28,33 @@ async def new_purchase_handler(query: CallbackQuery, state: FSMContext):
         return
 
     await message.edit_text(
+        messages.ASK_CONTRACT_TYPE,
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [
+                InlineKeyboardButton(text='Безнал', callback_data=ContractTypeCallback(cashless=True).pack()),
+                InlineKeyboardButton(text='Нал', callback_data=ContractTypeCallback(cashless=False).pack())
+            ],
+        ] + cancel_kb.inline_keyboard
+        )
+    )
+    await state.update_data(init_message_id=message.message_id)
+    await state.set_state(NewPurchaseState.contract_type)
+
+
+@router.callback_query(NewPurchaseState.contract_type, ContractTypeCallback.filter())
+async def cashless_contract_handler(query: CallbackQuery, callback_data: ContractTypeCallback, state: FSMContext):
+    await query.answer()
+
+    message = query.message
+    if not message:
+        return
+
+    await message.edit_text(
         messages.ASK_SUPPLIER,
         reply_markup=cancel_kb
     )
-    await state.update_data(init_message_id=message.message_id)
+
+    await state.update_data(cashless=callback_data.cashless)
     await state.set_state(NewPurchaseState.supplier)
 
 
@@ -44,33 +69,36 @@ async def supplier_handler(message: Message, state: FSMContext):
         return
 
     await edit_message(message.chat.id, init_message_id, messages.ASK_AMOUNT, cancel_kb)
-    
+
     await state.update_data(supplier=supplier)
     await state.set_state(NewPurchaseState.amount)
-
 
 
 @router.message(NewPurchaseState.amount, F.text)
 async def amount_handler(message: Message, state: FSMContext):
     await message.delete()
-    
-    amount = message.text or ''
 
+    amount = message.text or ''
+    await state.update_data(amount=amount)
+    
+    data = await state.get_data()
+    if data.get('cashless'):
+        await state.update_data(price='', card='')
+        await create_new_purchase(message, state)
+        return
+    
     init_message_id = await get_init_message_id(state)
     if not init_message_id:
         return
 
     await edit_message(message.chat.id, init_message_id, messages.ASK_PRICE, cancel_kb)
-    
-    await state.update_data(amount=amount)
     await state.set_state(NewPurchaseState.price)
-
 
 
 @router.message(NewPurchaseState.price, F.text)
 async def price_handler(message: Message, state: FSMContext):
     await message.delete()
-    
+
     price = message.text or ''
 
     init_message_id = await get_init_message_id(state)
@@ -78,7 +106,7 @@ async def price_handler(message: Message, state: FSMContext):
         return
 
     await edit_message(message.chat.id, init_message_id, messages.ASK_CARD, cancel_kb)
-    
+
     await state.update_data(price=price)
     await state.set_state(NewPurchaseState.card)
 
@@ -87,12 +115,15 @@ async def price_handler(message: Message, state: FSMContext):
 async def card_handler(message: Message, state: FSMContext):
     await message.delete()
 
+    card = message.text or ''
+    await state.update_data(card=card)
+    await create_new_purchase(message, state)
+
+
+async def create_new_purchase(message: Message, state: FSMContext):
     init_message_id = await get_init_message_id(state)
     if not init_message_id:
         return
-
-    card = message.text or ''
-    await state.update_data(card=card)
 
     purchase = await new_purchase(message, state)
     if purchase is None:
@@ -100,17 +131,20 @@ async def card_handler(message: Message, state: FSMContext):
         return
 
     await edit_message(
-        message.chat.id, 
-        init_message_id, 
+        message.chat.id,
+        init_message_id,
         messages.SUCCESSFUL_CREATE_PURCHASE.format(
+            contract_type=purchase.contract_type,
             supplier=purchase.supplier,
             amount=purchase.amount,
             price=purchase.price,
             card=purchase.card,
         ),
         InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='Назад', callback_data=MainPageCallback().pack())]
+            [InlineKeyboardButton(
+                text='Назад', callback_data=MainPageCallback().pack())]
         ])
     )
     await state.clear()
-    
+
+    update_statistic_table(make_statistic())

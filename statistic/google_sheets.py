@@ -31,9 +31,9 @@ def update_statistic_table(data: list[list[str]]):
     if service is None:
         init_service()
 
-    try:
-        sheet = service.open(SHEET_NAME)
-        worksheet = sheet.worksheet(WORKSHEET_NAME)
-        worksheet.update('A1', data)
-    except:
-        pass
+    # try:
+    sheet = service.open(SHEET_NAME)
+    worksheet = sheet.worksheet(WORKSHEET_NAME)
+    worksheet.update('A1', data)
+    # except:
+    #     pass

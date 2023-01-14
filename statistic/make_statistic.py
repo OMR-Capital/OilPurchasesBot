@@ -4,11 +4,12 @@ from odetam.exceptions import ItemNotFound
 
 TABLE_HEAD = [
     'Номер',
+    'Тип договора',
     'Время создания',
     'Создатель заявки',
     'Поставщик',
-    'Объем',
-    'Цена',
+    'Объем (в литрах)',
+    'Цена (за литр)',
     'Счет оплаты',
     'Время одобрения'
     'Одобривший заявку',
@@ -38,6 +39,7 @@ def make_statistic() -> list[list[str]]:
 
         statistic_data.append([
             purchase.key or '',
+            purchase.contract_type,
             purchase.create_time.isoformat(' ', 'minutes'),
             creator_name,
             purchase.supplier,

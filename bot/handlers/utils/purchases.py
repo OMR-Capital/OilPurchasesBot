@@ -19,10 +19,11 @@ async def new_purchase(message: Message, state: FSMContext) -> Optional[Purchase
     result = User.query(User.chat_id == message.chat.id)
     if not result:
         return None
-    
+
     creator = result.pop()
 
     purchase = Purchase(
+        contract_type='Безнал' if data.get('cashless') else 'Нал',
         supplier=data.get('supplier'),
         amount=data.get('amount'),
         price=data.get('price'),
@@ -34,9 +35,8 @@ async def new_purchase(message: Message, state: FSMContext) -> Optional[Purchase
     purchase.save()
 
     await spread_purchase(purchase, creator)
-
     return purchase
-    
+
 
 async def spread_purchase(purchase: Purchase, creator: User):
     bot = Bot.get_current()
@@ -44,32 +44,36 @@ async def spread_purchase(purchase: Purchase, creator: User):
         return
 
     spread = Spread(purchase=purchase.key, messages=[])
-    admins = User.query((User.mode == 'admin') | (User.mode == 'superuser')) # type: ignore
+    admins = User.query((User.mode == 'admin') | (User.mode == 'superuser'))  # type: ignore
     for admin in admins:
         try:
             msg = await bot.send_message(
                 admin.chat_id or 0,
-                messages.PURCHASE.format(
+                messages.PURCHASE_NOTIFICATION.format(
+                    contract_type=purchase.contract_type,
                     creator=creator.name,
-                    time=purchase.create_time.isoformat(sep=' ', timespec='minutes'),
+                    time=purchase.create_time.isoformat(
+                        sep=' ', timespec='minutes'),
                     supplier=purchase.supplier,
                     amount=purchase.amount,
                     price=purchase.price,
-                    card=purchase.card,        
+                    card=purchase.card,
                 ),
                 reply_markup=InlineKeyboardMarkup(inline_keyboard=[
                     [
                         InlineKeyboardButton(
                             text='Подтвердить',
-                            callback_data=ApprovePurchaseCallback(purchase=purchase.key).pack()
+                            callback_data=ApprovePurchaseCallback(
+                                purchase=(purchase.key or '')
+                            ).pack()
                         )
                     ]
                 ])
-            ) 
+            )
             spread.messages.append((msg.chat.id, msg.message_id))
         except:
             pass
-            
+
     spread.save()
 
 
@@ -91,11 +95,11 @@ async def approve_purchase(message: Message, purchase_key: str) -> Optional[Purc
     purchase.approved = True
     purchase.approver = approver.key
     purchase.approve_time = datetime.now()
-    
+
     bot = Bot.get_current()
     if not bot:
         return
-
+    
     try:
         creator = User.get(purchase.creator)
     except ItemNotFound:
@@ -103,13 +107,14 @@ async def approve_purchase(message: Message, purchase_key: str) -> Optional[Purc
 
     try:
         await bot.send_message(
-            creator.chat_id,
+            creator.chat_id or 0,
             messages.PURCHASE_APPROVED.format(
                 approver=approver.name,
+                contract_type=purchase.contract_type,
                 supplier=purchase.supplier,
                 amount=purchase.amount,
                 price=purchase.price,
-                card=purchase.card,        
+                card=purchase.card,
             ),
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
                 [
@@ -126,7 +131,7 @@ async def approve_purchase(message: Message, purchase_key: str) -> Optional[Purc
     result = Spread.query(Spread.purchase == purchase.key)
     if not result:
         return purchase
-    
+
     spread = result.pop()
     for chat_id, message_id in spread.messages:
         try:
@@ -136,7 +141,3 @@ async def approve_purchase(message: Message, purchase_key: str) -> Optional[Purc
 
     purchase.save()
     return purchase
-
-    
-        
-    
