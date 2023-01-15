@@ -1,6 +1,6 @@
 import json
 from os import getenv
-from typing import Any, Optional
+from typing import Optional
 
 import gspread
 from deta import Drive
@@ -12,6 +12,13 @@ WORKSHEET_NAME = getenv('GOOGLE_WORKSHEET_NAME')
 
 
 service: Optional[Client] = None
+
+
+def load_key_file(file_path: str):
+    drive = Drive('config')
+
+    with open(file_path, 'r') as f:
+        drive.put(KEY_FILE, f)
 
 
 def init_service():

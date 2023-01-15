@@ -26,7 +26,7 @@ async def open_main_page(message: Message):
     await message.edit_text(
         messages.MAIN_PAGE,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='Статистика', url=getenv('GOOGLE_TABLE_LINK', ''))]
+            [InlineKeyboardButton(text='Статистика', url=getenv('GOOGLE_SHEET_LINK', ''))]
         ])
     )
 

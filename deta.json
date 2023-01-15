@@ -1,0 +1,44 @@
+{
+	"name": "purchases-bot",
+	"description": "Purchases management telegram  bot",
+	"runtime": "python3.9",
+	"env": [
+		{
+			"key": "BOT_TOKEN",
+			"description": "Telegram Bot Token obtained via Bot Father",
+			"required": true
+		},
+		{
+			"key": "TELEGRAM_SECRET",
+			"description": "Webhook secret string",
+			"required": true
+		},
+        {
+			"key": "ROOT_USERNAME",
+			"description": "Telegram username of user that will have access to backdoor commands",
+			"required": true
+		},
+        {
+            "key": "GOOGLE_KEY_FILE",
+            "description": "Name of google key secret file on deta storage.",
+            "value": "google-key.json",
+            "required": false
+        },
+        {
+            "key": "GOOGLE_SHEET_NAME",
+            "description": "Name of Google spreadsheet with statistic.",
+            "required": false
+        },
+        {
+            "key": "GOOGLE_WORKSHEET_NAME",
+            "description": "Name of Google spreadsheet worksheet with statistic.",
+            "required": false
+        },
+        {
+            "key": "GOOGLE_SHEET_LINK",
+            "description": "Link to statistic spreadsheet",
+            "required": false
+        }
+	]
+}
+
