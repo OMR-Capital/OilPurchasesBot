@@ -31,14 +31,15 @@ async def access_key_handler(message: Message, state: FSMContext):
 
     init_message_id = await get_init_message_id(state)
     if not init_message_id:
-        return
+        return 
 
     access_key = message.text or ''
     user = User.login_user(access_key, message.chat.id)
+
     if not user:
         await edit_message(message.chat.id, init_message_id, messages.WRONG_ACCESS_KEY)
         return
-
+    
     if user.mode == 'superuser':
         await superuser.greet(message.chat.id, init_message_id, user)
     elif user.mode == 'admin':
