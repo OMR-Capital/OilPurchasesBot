@@ -8,8 +8,8 @@ class Purchase(DetaModel):
     client_type: str
     supplier: str
     inn: str
-    amount: int
-    price: int
+    amount: float
+    price: float
     card: str
     approved: bool
     approver: Optional[str]

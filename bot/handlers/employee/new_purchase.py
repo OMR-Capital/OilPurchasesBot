@@ -96,7 +96,7 @@ async def supplier_handler(message: Message, state: FSMContext):
     await state.set_state(NewPurchaseState.amount)
 
 
-@router.message(NewPurchaseState.amount, F.text)
+@router.message(NewPurchaseState.amount, F.text.regexp(r'^\d+\.?\d*$'))
 async def amount_handler(message: Message, state: FSMContext):
     await message.delete()
     
@@ -118,6 +118,17 @@ async def amount_handler(message: Message, state: FSMContext):
     await state.set_state(NewPurchaseState.price)
 
 
+@router.message(NewPurchaseState.amount, F.text)
+async def wrong_amount_handler(message: Message, state: FSMContext):
+    await message.delete()
+    
+    init_message_id = await get_init_message_id(state)
+    if not init_message_id:
+        return
+
+    await edit_message(message.chat.id, init_message_id, messages.WRONG_INTEGER, cancel_kb)
+
+
 @router.message(NewPurchaseState.inn, F.text)
 async def inn_handler(message: Message, state: FSMContext):
     await message.delete()
@@ -127,7 +138,7 @@ async def inn_handler(message: Message, state: FSMContext):
     await create_new_purchase(message, state)
 
 
-@router.message(NewPurchaseState.price, F.text)
+@router.message(NewPurchaseState.price, F.text.regexp(r'^\d+\.?\d*$'))
 async def price_handler(message: Message, state: FSMContext):
     await message.delete()
 
@@ -141,6 +152,17 @@ async def price_handler(message: Message, state: FSMContext):
 
     await state.update_data(price=price)
     await state.set_state(NewPurchaseState.card)
+
+
+@router.message(NewPurchaseState.price, F.text)
+async def wrong_price_handler(message: Message, state: FSMContext):
+    await message.delete()
+
+    init_message_id = await get_init_message_id(state)
+    if not init_message_id:
+        return
+
+    await edit_message(message.chat.id, init_message_id, messages.WRONG_INTEGER, cancel_kb)
 
 
 @router.message(NewPurchaseState.card, F.text)

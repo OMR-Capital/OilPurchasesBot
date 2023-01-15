@@ -66,6 +66,7 @@ async def spread_purchase(purchase: Purchase, creator: User):
                     amount=purchase.amount,
                     price=purchase.price,
                     card=purchase.card,
+                    full_price=purchase.amount * purchase.price
                 ),
                 reply_markup=InlineKeyboardMarkup(inline_keyboard=[
                     [
