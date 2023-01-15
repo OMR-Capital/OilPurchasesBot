@@ -9,6 +9,7 @@ TIMEZONE = timezone(timedelta(hours=3), name='Europe/Moscow')
 TABLE_HEAD = [
     'Номер',
     'Тип договора',
+    'Клиент',
     'Время создания',
     'Создатель заявки',
     'Поставщик',
@@ -51,6 +52,7 @@ def make_statistic() -> list[list[str]]:
         statistic_data.append([
             purchase.key or '',
             purchase.contract_type,
+            purchase.client_type,
             create_time,
             creator_name,
             purchase.supplier,

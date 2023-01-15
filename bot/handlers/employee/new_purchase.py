@@ -4,7 +4,8 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
                            InlineKeyboardMarkup, Message)
 
 from bot import messages
-from bot.callbacks.employee import ContractTypeCallback, MainPageCallback, NewPurchaseCallback
+from bot.callbacks.employee import (ClientTypeCallback, ContractTypeCallback,
+                                    MainPageCallback, NewPurchaseCallback)
 from bot.handlers.utils import edit_message, get_init_message_id
 from bot.handlers.utils.chat import error
 from bot.handlers.utils.purchases import new_purchase
@@ -42,19 +43,41 @@ async def new_purchase_handler(query: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(NewPurchaseState.contract_type, ContractTypeCallback.filter())
-async def cashless_contract_handler(query: CallbackQuery, callback_data: ContractTypeCallback, state: FSMContext):
+async def contract_type_handler(query: CallbackQuery, callback_data: ContractTypeCallback, state: FSMContext):
     await query.answer()
 
     message = query.message
     if not message:
         return
+    
+    await message.edit_text(
+        messages.ASK_CLIENT_TYPE,
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [
+                InlineKeyboardButton(text='Менеджерский', callback_data=ClientTypeCallback(from_manager=True).pack()),
+                InlineKeyboardButton(text='Собственный', callback_data=ClientTypeCallback(from_manager=False).pack())
+            ],
+        ] + cancel_kb.inline_keyboard
+        )
+    )
+    await state.update_data(cashless=callback_data.cashless)
+    await state.set_state(NewPurchaseState.client_type)
 
+
+@router.callback_query(NewPurchaseState.client_type, ClientTypeCallback.filter())
+async def client_type_handler(query: CallbackQuery, callback_data: ClientTypeCallback, state: FSMContext):
+    await query.answer()
+
+    message = query.message
+    if not message:
+        return
+    
     await message.edit_text(
         messages.ASK_SUPPLIER,
         reply_markup=cancel_kb
     )
 
-    await state.update_data(cashless=callback_data.cashless)
+    await state.update_data(from_manager=callback_data.from_manager)
     await state.set_state(NewPurchaseState.supplier)
 
 
@@ -134,6 +157,7 @@ async def create_new_purchase(message: Message, state: FSMContext):
         message.chat.id,
         init_message_id,
         messages.SUCCESSFUL_CREATE_PURCHASE.format(
+            client_type=purchase.client_type,
             contract_type=purchase.contract_type,
             supplier=purchase.supplier,
             amount=purchase.amount,

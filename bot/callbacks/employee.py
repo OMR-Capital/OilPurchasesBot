@@ -13,5 +13,9 @@ class ContractTypeCallback(CallbackData, prefix='employee.new_purchase.contract_
     cashless: bool
 
 
+class ClientTypeCallback(CallbackData, prefix='employee.new_purchase.contract_type'):
+    from_manager: bool
+
+
 class HidePurchaseCallback(CallbackData, prefix='employee.hide_purchase'):
     pass
