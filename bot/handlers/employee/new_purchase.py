@@ -85,37 +85,46 @@ async def client_type_handler(query: CallbackQuery, callback_data: ClientTypeCal
 async def supplier_handler(message: Message, state: FSMContext):
     await message.delete()
 
-    supplier = message.text or ''
-
     init_message_id = await get_init_message_id(state)
     if not init_message_id:
         return
 
-    await edit_message(message.chat.id, init_message_id, messages.ASK_AMOUNT, cancel_kb)
-
+    supplier = message.text or ''
     await state.update_data(supplier=supplier)
+
+    await edit_message(message.chat.id, init_message_id, messages.ASK_AMOUNT, cancel_kb)
     await state.set_state(NewPurchaseState.amount)
 
 
 @router.message(NewPurchaseState.amount, F.text)
 async def amount_handler(message: Message, state: FSMContext):
     await message.delete()
+    
+    init_message_id = await get_init_message_id(state)
+    if not init_message_id:
+        return
 
     amount = message.text or ''
     await state.update_data(amount=amount)
     
     data = await state.get_data()
     if data.get('cashless'):
-        await state.update_data(price='', card='')
-        await create_new_purchase(message, state)
-        return
-    
-    init_message_id = await get_init_message_id(state)
-    if not init_message_id:
+        await edit_message(message.chat.id, init_message_id, messages.ASK_INN, cancel_kb)
+        await state.set_state(NewPurchaseState.inn)
         return
 
+    await state.update_data(inn='')
     await edit_message(message.chat.id, init_message_id, messages.ASK_PRICE, cancel_kb)
     await state.set_state(NewPurchaseState.price)
+
+
+@router.message(NewPurchaseState.inn, F.text)
+async def inn_handler(message: Message, state: FSMContext):
+    await message.delete()
+
+    inn = message.text or ''
+    await state.update_data(inn=inn, price=0, card='')
+    await create_new_purchase(message, state)
 
 
 @router.message(NewPurchaseState.price, F.text)
@@ -157,6 +166,7 @@ async def create_new_purchase(message: Message, state: FSMContext):
         message.chat.id,
         init_message_id,
         messages.SUCCESSFUL_CREATE_PURCHASE.format(
+            inn=purchase.inn,
             client_type=purchase.client_type,
             contract_type=purchase.contract_type,
             supplier=purchase.supplier,

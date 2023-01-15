@@ -7,8 +7,9 @@ class Purchase(DetaModel):
     contract_type: str
     client_type: str
     supplier: str
-    amount: str
-    price: str
+    inn: str
+    amount: int
+    price: int
     card: str
     approved: bool
     approver: Optional[str]

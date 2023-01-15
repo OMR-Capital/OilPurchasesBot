@@ -41,6 +41,7 @@ def update_statistic_table(data: list[list[str]]):
     try:
         sheet = service.open(SHEET_NAME)
         worksheet = sheet.worksheet(WORKSHEET_NAME)
+        worksheet.clear()
         worksheet.update('A1', data)
     except:
         pass

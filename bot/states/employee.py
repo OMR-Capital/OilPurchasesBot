@@ -6,5 +6,6 @@ class NewPurchaseState(StatesGroup):
     amount = State()
     client_type = State()
     contract_type = State()
+    inn = State()
     price = State()
     card = State()

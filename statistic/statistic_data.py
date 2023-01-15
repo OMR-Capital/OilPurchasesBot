@@ -15,8 +15,9 @@ TABLE_HEAD = [
     'Поставщик',
     'Объем (в литрах)',
     'Цена (за литр)',
+    'ИНН',
     'Счет оплаты',
-    'Время одобрения'
+    'Время одобрения',
     'Одобривший заявку'
 ]
 
@@ -56,8 +57,9 @@ def make_statistic() -> list[list[str]]:
             create_time,
             creator_name,
             purchase.supplier,
-            purchase.amount,
-            purchase.price,
+            str(purchase.amount),
+            str(purchase.price),
+            purchase.inn,
             purchase.card,
             approve_time,
             approver_name,

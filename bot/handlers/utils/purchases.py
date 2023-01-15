@@ -27,6 +27,7 @@ async def new_purchase(message: Message, state: FSMContext) -> Optional[Purchase
     purchase = Purchase(
         client_type='Менеджерский' if data.get('from_manager') else 'Собственный',
         contract_type='Безнал' if data.get('cashless') else 'Нал',
+        inn=data.get('inn'),
         supplier=data.get('supplier'),
         amount=data.get('amount'),
         price=data.get('price'),
@@ -58,6 +59,7 @@ async def spread_purchase(purchase: Purchase, creator: User):
                 messages.PURCHASE_NOTIFICATION.format(
                     creator=creator.name,
                     time=create_time.isoformat(sep=' ', timespec='minutes'),
+                    inn=purchase.inn,
                     contract_type=purchase.contract_type,
                     client_type=purchase.client_type,
                     supplier=purchase.supplier,
@@ -118,6 +120,7 @@ async def approve_purchase(message: Message, purchase_key: str) -> Optional[Purc
                 approver=approver.name,
                 contract_type=purchase.contract_type,
                 client_type=purchase.client_type,
+                inn=purchase.inn,
                 supplier=purchase.supplier,
                 amount=purchase.amount,
                 price=purchase.price,
