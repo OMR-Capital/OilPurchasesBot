@@ -17,7 +17,7 @@ To get access for functionality of one of this roles you should call login form 
 1. Create bot via BotFather
 2. Click on `Deploy to Deta`
 
-    [![Deploy](https://button.deta.dev/1/svg)](https://go.deta.dev/deploy?repo=https://github.com/aiogram/deta)
+    [![Deploy](https://button.deta.dev/1/svg)](https://go.deta.dev/deploy?repo=https://github.com/mamsdeveloper/PurchasesBot)
 3. Enter env variables (GOOGLE section may be skipped)
 4. Set webhook:
 
