@@ -1,12 +1,11 @@
 from datetime import timedelta, timezone
 
-from models import Purchase, User
+from models import Fueling, Purchase, User
 from odetam.exceptions import ItemNotFound
-
 
 TIMEZONE = timezone(timedelta(hours=3), name='Europe/Moscow')
 
-TABLE_HEAD = [
+PURCHASES_TABLE_HEAD = [
     'Номер',
     'Тип договора',
     'Клиент',
@@ -22,11 +21,11 @@ TABLE_HEAD = [
 ]
 
 
-def make_statistic() -> list[list[str]]:
+def make_purchases_statistic() -> list[list[str]]:
     purchases = Purchase.get_all()
     purchases.sort(key=lambda purchase: purchase.create_time, reverse=True)
 
-    statistic_data = [TABLE_HEAD]
+    statistic_data = [PURCHASES_TABLE_HEAD]
     for purchase in purchases:
         try:
             creator = User.get(purchase.creator)
@@ -43,13 +42,15 @@ def make_statistic() -> list[list[str]]:
         else:
             approver_name = ''
 
-        create_time = purchase.create_time.astimezone(TIMEZONE).isoformat(' ', 'minutes')
+        create_time = purchase.create_time.astimezone(
+            TIMEZONE).isoformat(' ', 'minutes')
 
         if purchase.approve_time:
-            approve_time = purchase.approve_time.astimezone(TIMEZONE).isoformat(' ', 'minutes')  
+            approve_time = purchase.approve_time.astimezone(
+                TIMEZONE).isoformat(' ', 'minutes')
         else:
             approve_time = ''
-            
+
         statistic_data.append([
             purchase.key or '',
             purchase.contract_type,
@@ -63,6 +64,36 @@ def make_statistic() -> list[list[str]]:
             purchase.card,
             approve_time,
             approver_name,
+        ])
+
+    return statistic_data
+
+
+FUELING_TABLE_HEAD = [
+    'Номер',
+    'Работник',
+    'Время'
+]
+
+
+def make_fueling_statistic() -> list[list[str]]:
+    feelings = Fueling.get_all()
+    feelings.sort(key=lambda fueling: fueling.time, reverse=True)
+
+    statistic_data = [FUELING_TABLE_HEAD]
+    for fueling in feelings:
+        try:
+            employee = User.get(fueling.employee)
+            employee_name = employee.name
+        except ItemNotFound:
+            employee_name = 'Error'
+
+        time = fueling.time.astimezone(TIMEZONE).isoformat(' ', 'minutes')
+
+        statistic_data.append([
+            fueling.key or '',
+            employee_name,
+            time
         ])
 
     return statistic_data

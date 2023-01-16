@@ -7,9 +7,6 @@ from deta import Drive
 from gspread import Client
 
 KEY_FILE = getenv('GOOGLE_KEY_FILE', '')
-SHEET_NAME = getenv('GOOGLE_SHEET_NAME')
-WORKSHEET_NAME = getenv('GOOGLE_WORKSHEET_NAME')
-
 
 service: Optional[Client] = None
 
@@ -34,13 +31,13 @@ def init_service():
     service = gspread.service_account_from_dict(google_secret)
 
 
-def update_statistic_table(data: list[list[str]]):
+def update_statistic_table(data: list[list[str]], table_name: str, worksheet_name: str):
     if service is None:
         init_service()
 
     try:
-        sheet = service.open(SHEET_NAME)
-        worksheet = sheet.worksheet(WORKSHEET_NAME)
+        sheet = service.open(table_name)
+        worksheet = sheet.worksheet(worksheet_name)
         worksheet.clear()
         worksheet.update('A1', data)
     except:

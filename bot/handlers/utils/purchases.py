@@ -24,22 +24,26 @@ async def new_purchase(message: Message, state: FSMContext) -> Optional[Purchase
 
     creator = result.pop()
 
-    purchase = Purchase(
-        client_type='Менеджерский' if data.get('from_manager') else 'Собственный',
-        contract_type='Безнал' if data.get('cashless') else 'Нал',
-        inn=data.get('inn'),
-        supplier=data.get('supplier'),
-        amount=data.get('amount'),
-        price=data.get('price'),
-        card=data.get('card'),
-        bank=data.get('bank'),
-        approved=False,
-        creator=creator.key,
-        create_time=datetime.now()
-    )
-    purchase.save()
-
-    await spread_purchase(purchase, creator)
+    try:
+        purchase = Purchase(
+            client_type='Менеджерский' if data.get('from_manager') else 'Собственный',
+            contract_type='Безнал' if data.get('cashless') else 'Нал',
+            inn=data.get('inn'),
+            supplier=data.get('supplier'),
+            amount=data.get('amount'),
+            price=data.get('price'),
+            card=data.get('card'),
+            bank=data.get('bank'),
+            approved=False,
+            creator=creator.key,
+            create_time=datetime.now()
+        )
+        purchase.save()
+    except:
+        return None
+    else:
+        await spread_purchase(purchase, creator)
+        
     return purchase
 
 

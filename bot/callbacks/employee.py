@@ -19,3 +19,7 @@ class ClientTypeCallback(CallbackData, prefix='employee.new_purchase.contract_ty
 
 class HidePurchaseCallback(CallbackData, prefix='employee.hide_purchase'):
     pass
+
+
+class NewFuelingCallback(CallbackData, prefix='employee.new_fueling'):
+    pass
