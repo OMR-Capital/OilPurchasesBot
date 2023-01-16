@@ -32,6 +32,7 @@ async def new_purchase(message: Message, state: FSMContext) -> Optional[Purchase
         amount=data.get('amount'),
         price=data.get('price'),
         card=data.get('card'),
+        bank=data.get('bank'),
         approved=False,
         creator=creator.key,
         create_time=datetime.now()
@@ -66,6 +67,7 @@ async def spread_purchase(purchase: Purchase, creator: User):
                     amount=purchase.amount,
                     price=purchase.price,
                     card=purchase.card,
+                    bank=purchase.bank,
                     full_price=purchase.amount * purchase.price
                 ),
                 reply_markup=InlineKeyboardMarkup(inline_keyboard=[
@@ -126,6 +128,7 @@ async def approve_purchase(message: Message, purchase_key: str) -> Optional[Purc
                 amount=purchase.amount,
                 price=purchase.price,
                 card=purchase.card,
+                bank=purchase.bank,
             ),
             reply_markup=InlineKeyboardMarkup(inline_keyboard=[
                 [

@@ -169,8 +169,23 @@ async def wrong_price_handler(message: Message, state: FSMContext):
 async def card_handler(message: Message, state: FSMContext):
     await message.delete()
 
+    init_message_id = await get_init_message_id(state)
+    if not init_message_id:
+        return
+
     card = message.text or ''
     await state.update_data(card=card)
+
+    await edit_message(message.chat.id, init_message_id, messages.ASK_BANK, cancel_kb)
+    await state.set_state(NewPurchaseState.bank)
+
+
+@router.message(NewPurchaseState.bank, F.text)
+async def bank_handler(message: Message, state: FSMContext):
+    await message.delete()
+
+    bank = message.text or ''
+    await state.update_data(bank=bank)
     await create_new_purchase(message, state)
 
 
@@ -195,6 +210,7 @@ async def create_new_purchase(message: Message, state: FSMContext):
             amount=purchase.amount,
             price=purchase.price,
             card=purchase.card,
+            bank=purchase.bank
         ),
         InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(

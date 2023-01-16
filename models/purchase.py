@@ -11,6 +11,7 @@ class Purchase(DetaModel):
     amount: float
     price: float
     card: str
+    bank: str
     approved: bool
     approver: Optional[str]
     approve_time: Optional[datetime]

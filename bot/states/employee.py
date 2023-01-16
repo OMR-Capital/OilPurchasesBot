@@ -9,3 +9,4 @@ class NewPurchaseState(StatesGroup):
     inn = State()
     price = State()
     card = State()
+    bank = State()
