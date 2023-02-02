@@ -153,9 +153,10 @@ async def approve_purchase(message: Message, purchase_key: str) -> Optional[Purc
                 await bot.delete_message(chat_id, message_id)
             except:
                 pass
-        spread.delete()
     except ItemNotFound:
         pass
-
+    else:
+        spread.delete()
+        
     purchase.save()
     return purchase

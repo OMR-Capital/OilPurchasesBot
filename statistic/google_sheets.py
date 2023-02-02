@@ -1,6 +1,6 @@
 import json
 from os import getenv
-from typing import Optional
+from typing import Optional, Any
 
 import gspread
 from deta import Drive
@@ -26,12 +26,12 @@ def init_service():
 
     if not google_secret_file:
         return
-
+    
     google_secret = json.loads(google_secret_file.read())
     service = gspread.service_account_from_dict(google_secret)
 
 
-def update_statistic_table(data: list[list[str]], table_name: str, worksheet_name: str):
+def update_statistic_table(data: list[list[Any]], table_name: str, worksheet_name: str):
     if service is None:
         init_service()
 

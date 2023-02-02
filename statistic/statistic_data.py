@@ -1,4 +1,5 @@
 from datetime import timedelta, timezone
+from typing import Any
 
 from models import Fueling, Purchase, User
 from odetam.exceptions import ItemNotFound
@@ -21,11 +22,11 @@ PURCHASES_TABLE_HEAD = [
 ]
 
 
-def make_purchases_statistic() -> list[list[str]]:
+def make_purchases_statistic() -> list[list[Any]]:
     purchases = Purchase.get_all()
     purchases.sort(key=lambda purchase: purchase.create_time, reverse=True)
 
-    statistic_data = [PURCHASES_TABLE_HEAD]
+    statistic_data: list[list[Any]] = [PURCHASES_TABLE_HEAD]
     for purchase in purchases:
         try:
             creator = User.get(purchase.creator)
@@ -58,8 +59,8 @@ def make_purchases_statistic() -> list[list[str]]:
             create_time,
             creator_name,
             purchase.supplier,
-            str(purchase.amount),
-            str(purchase.price),
+            purchase.amount,
+            purchase.price,
             purchase.inn,
             purchase.card,
             approve_time,
@@ -76,11 +77,11 @@ FUELING_TABLE_HEAD = [
 ]
 
 
-def make_fueling_statistic() -> list[list[str]]:
+def make_fueling_statistic() -> list[list[Any]]:
     feelings = Fueling.get_all()
     feelings.sort(key=lambda fueling: fueling.time, reverse=True)
 
-    statistic_data = [FUELING_TABLE_HEAD]
+    statistic_data: list[list[Any]] = [FUELING_TABLE_HEAD]
     for fueling in feelings:
         try:
             employee = User.get(fueling.employee)
