@@ -39,6 +39,6 @@ def update_statistic_table(data: list[list[Any]], table_name: str, worksheet_nam
         sheet = service.open(table_name)
         worksheet = sheet.worksheet(worksheet_name)
         worksheet.clear()
-        worksheet.update('A1', data)
+        worksheet.update('A1', data, raw=False)
     except:
         pass

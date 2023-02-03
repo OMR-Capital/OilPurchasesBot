@@ -1,4 +1,4 @@
-from datetime import timedelta, timezone
+from datetime import timedelta, timezone, datetime
 from typing import Any
 
 from models import Fueling, Purchase, User
@@ -22,6 +22,10 @@ PURCHASES_TABLE_HEAD = [
 ]
 
 
+def format_datetime(dt: datetime) -> str:
+    return dt.strftime('%d.%m.%Y %H:%M')
+
+
 def make_purchases_statistic() -> list[list[Any]]:
     purchases = Purchase.get_all()
     purchases.sort(key=lambda purchase: purchase.create_time, reverse=True)
@@ -43,12 +47,10 @@ def make_purchases_statistic() -> list[list[Any]]:
         else:
             approver_name = ''
 
-        create_time = purchase.create_time.astimezone(
-            TIMEZONE).isoformat(' ', 'minutes')
+        create_time = format_datetime(purchase.create_time.astimezone(TIMEZONE))
 
         if purchase.approve_time:
-            approve_time = purchase.approve_time.astimezone(
-                TIMEZONE).isoformat(' ', 'minutes')
+            approve_time = format_datetime(purchase.approve_time.astimezone(TIMEZONE))
         else:
             approve_time = ''
 
@@ -61,8 +63,8 @@ def make_purchases_statistic() -> list[list[Any]]:
             purchase.supplier,
             purchase.amount,
             purchase.price,
-            purchase.inn,
-            purchase.card,
+            "'" + purchase.inn,
+            "'" + purchase.card,
             approve_time,
             approver_name,
         ])
@@ -89,7 +91,7 @@ def make_fueling_statistic() -> list[list[Any]]:
         except ItemNotFound:
             employee_name = 'Error'
 
-        time = fueling.time.astimezone(TIMEZONE).isoformat(' ', 'minutes')
+        time = format_datetime(fueling.time.astimezone(TIMEZONE))
 
         statistic_data.append([
             fueling.key or '',
@@ -98,3 +100,4 @@ def make_fueling_statistic() -> list[list[Any]]:
         ])
 
     return statistic_data
+
