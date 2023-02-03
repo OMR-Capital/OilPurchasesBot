@@ -75,7 +75,8 @@ def make_purchases_statistic() -> list[list[Any]]:
 FUELING_TABLE_HEAD = [
     'Номер',
     'Работник',
-    'Время'
+    'Время',
+    'Стоимость'
 ]
 
 
@@ -96,7 +97,8 @@ def make_fueling_statistic() -> list[list[Any]]:
         statistic_data.append([
             fueling.key or '',
             employee_name,
-            time
+            time,
+            fueling.cost,
         ])
 
     return statistic_data

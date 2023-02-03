@@ -23,3 +23,8 @@ class HidePurchaseCallback(CallbackData, prefix='employee.hide_purchase'):
 
 class NewFuelingCallback(CallbackData, prefix='employee.new_fueling'):
     pass
+
+
+class FuelingCostCallback(CallbackData, prefix='employee.new_fueling.cost'):
+    cost: int
+    

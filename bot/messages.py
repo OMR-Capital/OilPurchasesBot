@@ -72,6 +72,7 @@ PURCHASE_APPROVED = '''
 
 SUCCESSFUL_MAKE_STATISTIC = 'Отчет успешно создан.'
 
+ASK_FUELING_COST = 'Укажите стоимость заправки:' 
 SUCCESSFUL_CREATE_FUELING = 'Запись о заправке успешно добавлена.'
 
 ERROR = 'Произошла какая-то ошибка. Попробуйте снова.'

@@ -10,3 +10,8 @@ class NewPurchaseState(StatesGroup):
     price = State()
     card = State()
     bank = State()
+
+
+class NewFueling(StatesGroup):
+    cost = State()
+    
