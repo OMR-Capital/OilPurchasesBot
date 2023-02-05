@@ -10,7 +10,7 @@ from bot.handlers.utils import edit_message, get_init_message_id
 from bot.handlers.utils.chat import error
 from bot.handlers.utils.purchases import new_purchase
 from bot.states.employee import NewPurchaseState
-from statistic import update_purchases_statistic
+from statistic.purchases_statistic import update_purchases_statistic
 
 router = Router()
 

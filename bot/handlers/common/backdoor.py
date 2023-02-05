@@ -6,7 +6,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from models import User
-from statistic import update_fuelings_statistic, update_purchases_statistic
+from statistic.purchases_statistic import update_purchases_statistic
+from statistic.fuelings_statistic import update_fuelings_statistic
 
 router = Router()
 

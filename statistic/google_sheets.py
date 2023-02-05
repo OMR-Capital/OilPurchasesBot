@@ -1,8 +1,10 @@
 import json
 from os import getenv
-from typing import Optional, Any
+from typing import Optional
 
 import gspread
+from gspread import Worksheet
+from gspread.exceptions import WorksheetNotFound
 from deta import Drive
 from gspread import Client
 
@@ -31,14 +33,18 @@ def init_service():
     service = gspread.service_account_from_dict(google_secret)
 
 
-def update_statistic_table(data: list[list[Any]], table_name: str, worksheet_name: str):
+def get_worksheet(table_name: str, worksheet_name: str) -> Optional[Worksheet]:
     if service is None:
         init_service()
 
     try:
         sheet = service.open(table_name)
-        worksheet = sheet.worksheet(worksheet_name)
-        worksheet.clear()
-        worksheet.update('A1', data, raw=False)
-    except:
-        pass
+        try:
+            worksheet = sheet.worksheet(worksheet_name)
+        except WorksheetNotFound:
+            worksheet = sheet.add_worksheet(worksheet_name, rows=1, cols=1)
+            
+        return worksheet
+    except Exception:
+        return None
+        

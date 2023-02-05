@@ -24,6 +24,6 @@ async def webhook_route(
     try:
         response = await dispatcher.feed_update(bot, update=update)
     except Exception as e:
-        response = str(e)
+        response = f'{e.__class__.__name__}: {e}'
         
     return {'ok': True, 'response': response}

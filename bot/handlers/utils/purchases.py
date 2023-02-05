@@ -12,7 +12,7 @@ from models import Purchase, User
 from models.spread import Spread
 from odetam.exceptions import ItemNotFound
 
-TIMEZONE = timezone(timedelta(hours=3), name='Europe/Moscow')
+from utils.constants import MSC_TZ
 
 
 async def new_purchase(message: Message, state: FSMContext) -> Optional[Purchase]:
@@ -57,7 +57,7 @@ async def spread_purchase(purchase: Purchase, creator: User):
         User.mode == 'superuser'))  # type: ignore
     for admin in admins:
         try:
-            create_time = purchase.create_time.astimezone(TIMEZONE)
+            create_time = purchase.create_time.astimezone(MSC_TZ)
 
             msg = await bot.send_message(
                 admin.chat_id or 0,
@@ -152,7 +152,7 @@ async def approve_purchase(message: Message, purchase_key: str) -> Optional[Purc
             try:
                 await bot.delete_message(chat_id, message_id)
             except:
-                pass
+                continue
     except ItemNotFound:
         pass
     else:

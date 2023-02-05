@@ -4,7 +4,8 @@ from aiogram.types import CallbackQuery
 from bot.callbacks.admin import ApprovePurchaseCallback
 from bot.handlers.utils.purchases import approve_purchase
 from bot import messages
-from statistic import update_purchases_statistic
+
+from statistic.purchases_statistic import update_purchases_statistic
 
 router = Router()
 
@@ -19,11 +20,12 @@ async def approve_purchase_handler(query: CallbackQuery, callback_data: ApproveP
 
     try:
         await approve_purchase(message, callback_data.purchase)
-        update_purchases_statistic()
-    except:
+    except Exception as e:
         await message.answer(messages.ERROR)
 
     try:
         await message.delete()
     except:
         pass
+
+    update_purchases_statistic()

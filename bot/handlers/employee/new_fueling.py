@@ -4,12 +4,14 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
                            InlineKeyboardMarkup)
 
 from bot import messages
-from bot.callbacks.employee import MainPageCallback, NewFuelingCallback, FuelingCostCallback
+from bot.callbacks.employee import (FuelingCostCallback, MainPageCallback,
+                                    NewFuelingCallback)
 from bot.handlers.utils.chat import error
 from bot.handlers.utils.fueling import new_fueling
 from bot.handlers.utils.message_edit import edit_message, get_init_message_id
 from bot.states.employee import NewFueling
-from statistic import update_fuelings_statistic
+from statistic.fuelings_statistic import update_fuelings_statistic
+
 
 router = Router()
 
@@ -75,6 +77,5 @@ async def fueling_cost_handler(query: CallbackQuery, state: FSMContext, callback
         ])
     )
 
-    update_fuelings_statistic()
-
     await state.clear()
+    update_fuelings_statistic()
