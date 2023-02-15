@@ -10,7 +10,6 @@ from bot.handlers.utils import edit_message, get_init_message_id
 from bot.handlers.utils.chat import error
 from bot.handlers.utils.purchases import new_purchase
 from bot.states.employee import NewPurchaseState
-from statistic.purchases_statistic import update_purchases_statistic
 
 router = Router()
 
@@ -49,7 +48,7 @@ async def contract_type_handler(query: CallbackQuery, callback_data: ContractTyp
     message = query.message
     if not message:
         return
-    
+
     await message.edit_text(
         messages.ASK_CLIENT_TYPE,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
@@ -71,7 +70,7 @@ async def client_type_handler(query: CallbackQuery, callback_data: ClientTypeCal
     message = query.message
     if not message:
         return
-    
+
     await message.edit_text(
         messages.ASK_SUPPLIER,
         reply_markup=cancel_kb
@@ -99,14 +98,14 @@ async def supplier_handler(message: Message, state: FSMContext):
 @router.message(NewPurchaseState.amount, F.text.regexp(r'^\d+\.?\d*$'))
 async def amount_handler(message: Message, state: FSMContext):
     await message.delete()
-    
+
     init_message_id = await get_init_message_id(state)
     if not init_message_id:
         return
 
     amount = message.text or ''
     await state.update_data(amount=amount)
-    
+
     data = await state.get_data()
     if data.get('cashless'):
         await edit_message(message.chat.id, init_message_id, messages.ASK_INN, cancel_kb)
@@ -121,7 +120,7 @@ async def amount_handler(message: Message, state: FSMContext):
 @router.message(NewPurchaseState.amount, F.text)
 async def wrong_amount_handler(message: Message, state: FSMContext):
     await message.delete()
-    
+
     init_message_id = await get_init_message_id(state)
     if not init_message_id:
         return
@@ -218,5 +217,3 @@ async def create_new_purchase(message: Message, state: FSMContext):
         ])
     )
     await state.clear()
-
-    update_purchases_statistic()

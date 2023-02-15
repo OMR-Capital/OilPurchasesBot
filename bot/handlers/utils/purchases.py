@@ -12,7 +12,7 @@ from models import Purchase, User
 from models.spread import Spread
 from odetam.exceptions import ItemNotFound
 
-from utils.constants import MSC_TZ
+from utils.datetime import MSC_TZ
 
 
 async def new_purchase(message: Message, state: FSMContext) -> Optional[Purchase]:

@@ -1,23 +1,19 @@
-import locale
 from os import getenv
 from typing import Any
 
-from gspread import Worksheet
 from gspread.exceptions import APIError
 
 from models import Purchase, User
 from odetam.exceptions import ItemNotFound
-from statistic.google_sheets import get_worksheet
-from statistic.utils import get_formatted_time
+from statistic.google_sheets import get_sheet, get_worksheet, update_worksheet
+from statistic.types import TableData, TableFormats
+from statistic.utils import get_formatted_time, get_rows_range
 
-
-locale.setlocale(
-    category=locale.LC_ALL,
-    locale="Russian" 
-)
 
 TABLE_HEAD = [
-    'Номер',
+    'Период',
+    'Объем',
+    'Стоимость',
     'Тип договора',
     'Клиент',
     'Время создания',
@@ -29,21 +25,26 @@ TABLE_HEAD = [
     'Счет оплаты',
     'Время одобрения',
     'Одобривший заявку',
-    'Итоги',
-    'Объем',
-    'Стоимость'
 ]
-
-
-WEEKDAYS = [
-    'Понедельник',
-    'Вторник',
-    'Среда',
-    'Четверг',
-    'Пятница',
-    'Суббота',
-    'Воскресенье',
-]
+TITLE_FORMAT = {
+    'textFormat': {'bold': True, 'fontSize': 10},
+    'horizontalAlignment': 'LEFT'
+}
+DAY_STATS_FORMAT = {
+    'backgroundColor': {'red': 0, 'green': 1, 'blue': 1},
+    'textFormat': {'bold': True, 'fontSize': 10},
+    'horizontalAlignment': 'LEFT'
+}
+WEEK_STATS_FORMAT = {
+    'backgroundColor': {'red': 1, 'green': 0, 'blue': 1},
+    'textFormat': {'bold': True, 'fontSize': 10},
+    'horizontalAlignment': 'LEFT'
+}
+MONTH_STATS_FORMAT = {
+    'backgroundColor': {'red': 1, 'green': 1, 'blue': 0},
+    'textFormat': {'bold': True, 'fontSize': 10},
+    'horizontalAlignment': 'LEFT'
+}
 
 
 def get_purchase_statistic_row(purchase: Purchase) -> list[Any]:
@@ -76,7 +77,7 @@ def get_purchase_statistic_row(purchase: Purchase) -> list[Any]:
         purchase.card = "'" + purchase.card
     
     return [
-        purchase.key or '',
+        '', '', '',
         purchase.contract_type,
         purchase.client_type,
         create_time,
@@ -92,182 +93,118 @@ def get_purchase_statistic_row(purchase: Purchase) -> list[Any]:
 
 
 def get_day_statistic_row(purchases: list[Purchase]) -> list[Any]:
+    if not purchases:
+        return []
+    
     total_amount = sum(purchase.amount for purchase in purchases)
     total_price = sum(purchase.amount * purchase.price for purchase in purchases)
     date = purchases[-1].create_time.strftime('%A %d.%m.%Y')
-    return [''] * len(TABLE_HEAD[:-3]) + [f'Итого за день {date}', total_amount, total_price]
+    return [f'{date}'.upper(), total_amount, total_price]
 
 
 def get_week_statistic_row(purchases: list[Purchase]) -> list[Any]:
+    if not purchases:
+        return []
+    
     total_amount = sum(purchase.amount for purchase in purchases)
     total_price = sum(purchase.amount * purchase.price for purchase in purchases)
     begin_date = purchases[-1].create_time.strftime('%d.%m.%Y')
     end_date = purchases[0].create_time.strftime('%d.%m.%Y')
-    return [''] * len(TABLE_HEAD[:-3]) + [f'Итого за неделю {begin_date} - {end_date}', total_amount, total_price]
+    return [f'неделя {begin_date} - {end_date}'.upper(), total_amount, total_price]
 
 
 def get_month_statistic_row(purchases: list[Purchase]) -> list[Any]:
+    if not purchases:
+        return []
+    
     total_amount = sum(purchase.amount for purchase in purchases)
     total_price = sum(purchase.amount * purchase.price for purchase in purchases)
     begin_date = purchases[-1].create_time.strftime('%B %d.%m.%Y')
     end_date = purchases[0].create_time.strftime('%d.%m.%Y')
-    return [''] * len(TABLE_HEAD[:-3]) + [f'Итого за месяц {begin_date} - {end_date}', total_amount, total_price]
+    return [f'{begin_date} - {end_date}'.upper(), total_amount, total_price]
 
 
-def get_cell_literal(row: int, column: int) -> str:
-    return f'{chr(65 + column)}{row + 1}'
-
-
-def format_purchases_statistic(table_data: list[list[str]], statistic_rows: list[int], worksheet: Worksheet):    
-    # clear formatting
-    worksheet.format(
-        'A1:Z1000', 
-        {
-            'borders': {}, 
-            'textFormat': {}, 
-            'backgroundColor': {'red': 1.0, 'green': 1.0, 'blue': 1.0}
-        }
-    )
-
-    # set bottom line for statistic rows
-    range_ = []
-    for row in statistic_rows:
-        begin = get_cell_literal(row, 0) 
-        end = get_cell_literal(row, len(TABLE_HEAD) - 1) 
-        range_.append(f'{begin}:{end}')
-
-    worksheet.format(
-        range_,
-        {
-            'borders': {
-                'bottom': {
-                    'style': 'SOLID', 
-                    'width': 3, 
-                    'color': {
-                        'red': 0.0, 
-                        'green': 0.0, 
-                        'blue': 0.0
-                    }
-                }
-            }
-        }
-    )
-
-    # set bold for table head
-    worksheet.format(
-        f'A1:{get_cell_literal(0, len(TABLE_HEAD) - 2)}',
-        {
-            'textFormat': {
-                'bold': True
-            }
-        }
-    )
-
-    # set right border between data and statistic
-    begin = get_cell_literal(0, len(TABLE_HEAD) - 3)
-    end = get_cell_literal(len(table_data), len(TABLE_HEAD) - 3)
-    range_ = f'{begin}:{end}'
-    worksheet.format(
-        range_,
-        {
-            'borders': {
-                'left': {
-                    'style': 'SOLID',
-                    'width': 3,
-                    'color': {
-                        'red': 0.0,
-                        'green': 0.0,
-                        'blue': 0.0
-                    } 
-                },
-            }
-        }
-    )
-
-    range_ = [
-        get_cell_literal(row, len(TABLE_HEAD) - 3) 
-        for row in statistic_rows
-    ]
-    worksheet.format(
-        range_,
-        {
-            'borders': {
-                'left': {
-                    'style': 'SOLID',
-                    'width': 3,
-                    'color': {
-                        'red': 0.0,
-                        'green': 0.0,
-                        'blue': 0.0
-                    }   
-                },
-                'bottom': {
-                    'style': 'SOLID',
-                    'width': 3,
-                    'color': {
-                        'red': 0.0,
-                        'green': 0.0,
-                        'blue': 0.0
-                    }   
-                }
-            }
-        }
-    )
-
-
-def create_purchases_statistic(table_name: str, worksheet_name: str, purchases: list[Purchase]) -> None:
-    worksheet = get_worksheet(table_name, worksheet_name)
-    if not worksheet:
-        return
-    
-    worksheet.clear()
-    
-    purchases.sort(key=lambda purchase: purchase.create_time, reverse=True)
+def get_purchases_statistic(purchases: list[Purchase]) -> tuple[TableData, TableFormats]:
+    purchases.sort(key=lambda purchase: purchase.create_time)
 
     day_purchases: list[Purchase] = []
+    day_rows: list[int] = []
     week_purchases: list[Purchase] = []
+    week_rows: list[int] = []
     month_purchases: list[Purchase] = []
-    statistic_rows: list[int] = []
-    
-    table_data: list[list[str]] = [TABLE_HEAD]
+    month_rows: list[int] = []
+
+    table_data: list[list[str]] = []
     for i in range(len(purchases)):
         purchase = purchases[i]
-        table_data.append(get_purchase_statistic_row(purchase))
+        next_purchase = purchases[i + 1] if i + 1 < len(purchases) else None
 
+        table_data.append(get_purchase_statistic_row(purchase))
         day_purchases.append(purchase)
         week_purchases.append(purchase)
         month_purchases.append(purchase)
-        
-        next_purchase = purchases[i + 1] if i + 1 < len(purchases) else None
-        if not next_purchase or purchase.create_time.day != next_purchase.create_time.day:
-            table_data.append(get_day_statistic_row(day_purchases))
-            statistic_rows.append(len(table_data) - 1)
-            day_purchases.clear()
 
-        if not next_purchase or purchase.create_time.weekday() < next_purchase.create_time.weekday():
+        if not next_purchase or purchase.create_time.date() != next_purchase.create_time.date():
+            table_data.append(get_day_statistic_row(day_purchases))
+            day_rows.append(len(table_data))
+            day_purchases = []
+
+        if not next_purchase or purchase.create_time.weekday() > next_purchase.create_time.weekday():
             table_data.append(get_week_statistic_row(week_purchases))
-            statistic_rows.append(len(table_data) - 1)
-            week_purchases.clear()
+            week_rows.append(len(table_data))
+            week_purchases = []
 
         if not next_purchase or purchase.create_time.month != next_purchase.create_time.month:
             table_data.append(get_month_statistic_row(month_purchases))
-            statistic_rows.append(len(table_data) - 1)
-            month_purchases.clear()
+            month_rows.append(len(table_data))
+            month_purchases = []
+            
+    day_rows = [len(table_data) - row + 1 for row in day_rows]
+    week_rows = [len(table_data) - row + 1 for row in week_rows]
+    month_rows = [len(table_data) - row + 1 for row in month_rows]
 
-    worksheet.update('A1', table_data, raw=False)
-    format_purchases_statistic(table_data, statistic_rows, worksheet)
+    table_data.append(TABLE_HEAD)
+    table_data.reverse()
+
+    title_formats = [
+        {'range': get_rows_range([0], len(TABLE_HEAD))[0], 'format': TITLE_FORMAT}
+    ]
+    day_stats_formats = [
+        {'range': row_range, 'format': DAY_STATS_FORMAT}
+        for row_range in get_rows_range(day_rows, len(TABLE_HEAD))
+    ]
+    week_stats_formats = [
+        {'range': row_range, 'format': WEEK_STATS_FORMAT}
+        for row_range in get_rows_range(week_rows, len(TABLE_HEAD))
+    ]
+    month_stats_formats = [
+        {'range': row_range, 'format': MONTH_STATS_FORMAT}
+        for row_range in get_rows_range(month_rows, len(TABLE_HEAD))
+    ]
+    
+    formats = title_formats + day_stats_formats + week_stats_formats + month_stats_formats
+    return table_data, formats
 
 
 def update_purchases_statistic() -> None:
-    table_name = getenv('GOOGLE_SHEET_NAME')
-    if not table_name:
+    sheet_name = getenv('GOOGLE_SHEET_NAME')
+    if not sheet_name:
+        return None
+    
+    sheet = get_sheet(sheet_name)
+    if not sheet:
         return None
     
     purchases = Purchase.get_all()
 
     # full statistic
+    purchases_worksheet = get_worksheet(sheet, 'Закупки')
+    if not purchases_worksheet:
+        return None
+        
+    table_data, formats = get_purchases_statistic(purchases)
     try:
-        create_purchases_statistic(table_name, 'Закупки', purchases)
+        update_worksheet(purchases_worksheet, table_data, formats)
     except APIError:
         return
 
@@ -280,8 +217,14 @@ def update_purchases_statistic() -> None:
             creator_name = 'Error'
         
         user_purchases = [purchase for purchase in purchases if purchase.creator == user_key]
+
+        user_purchases_worksheet = get_worksheet(sheet, creator_name)
+        if not user_purchases_worksheet:
+            return None
+        
+        table_data, formats = get_purchases_statistic(user_purchases)
         try:
-            create_purchases_statistic(table_name, creator_name, user_purchases)
+            update_worksheet(user_purchases_worksheet, table_data, formats)
         except APIError:
             return
     

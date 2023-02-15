@@ -1,4 +1,5 @@
 from os import getenv
+from time import time
 
 from aiogram import Router
 from aiogram.filters.command import Command
@@ -29,10 +30,14 @@ async def create_root_handler(message: Message, state: FSMContext):
 @router.message(Command(commands=['update_statistic']))
 async def update_statistic_handler(message: Message, state: FSMContext):
     await state.clear()
+    await message.answer('Wait...')
+
+    st = time()
 
     if message.chat.username != getenv('ROOT_USERNAME'):
         return
     
     update_purchases_statistic()
-    update_fuelings_statistic()
+    # update_fuelings_statistic()
+    await message.answer(f'{time() - st:.2f}s')
     await message.answer('Statistic updated')
