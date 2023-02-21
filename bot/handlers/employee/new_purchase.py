@@ -5,7 +5,7 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
 
 from bot import messages
 from bot.callbacks.employee import (ClientTypeCallback, ContractTypeCallback,
-                                    MainPageCallback, NewPurchaseCallback)
+                                    MainPageCallback, NewPurchaseCallback, UnitCallback)
 from bot.handlers.utils import edit_message, get_init_message_id
 from bot.handlers.utils.chat import error
 from bot.handlers.utils.purchases import new_purchase
@@ -91,7 +91,34 @@ async def supplier_handler(message: Message, state: FSMContext):
     supplier = message.text or ''
     await state.update_data(supplier=supplier)
 
-    await edit_message(message.chat.id, init_message_id, messages.ASK_AMOUNT, cancel_kb)
+    await edit_message(
+        message.chat.id,
+        init_message_id,
+        messages.ASK_UNIT,
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [
+                InlineKeyboardButton(text='Литры', callback_data=UnitCallback(unit='liter').pack()),
+                InlineKeyboardButton(text='Килограммы', callback_data=UnitCallback(unit='kg').pack())
+            ],
+        ] + cancel_kb.inline_keyboard)
+    )
+    await state.set_state(NewPurchaseState.unit)
+
+
+@router.callback_query(NewPurchaseState.unit, UnitCallback.filter())
+async def unit_handler(query: CallbackQuery, callback_data: UnitCallback, state: FSMContext):
+    await query.answer()
+
+    message = query.message
+    if not message:
+        return
+
+    await message.edit_text(
+        messages.ask_amount(callback_data.unit),
+        reply_markup=cancel_kb
+    )
+
+    await state.update_data(unit=callback_data.unit)
     await state.set_state(NewPurchaseState.amount)
 
 
@@ -113,7 +140,12 @@ async def amount_handler(message: Message, state: FSMContext):
         return
 
     await state.update_data(inn='')
-    await edit_message(message.chat.id, init_message_id, messages.ASK_PRICE, cancel_kb)
+    await edit_message(
+        message.chat.id,
+        init_message_id,
+        messages.ask_price(data['unit']),
+        cancel_kb
+    )
     await state.set_state(NewPurchaseState.price)
 
 
@@ -197,7 +229,7 @@ async def create_new_purchase(message: Message, state: FSMContext):
     if purchase is None:
         await error(message.chat.id, init_message_id, MainPageCallback().pack())
         return
-
+    
     await edit_message(
         message.chat.id,
         init_message_id,

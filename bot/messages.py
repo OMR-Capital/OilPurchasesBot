@@ -1,3 +1,6 @@
+from typing import Literal
+
+
 START = 'Я помогу Вам управлять закупками!'
 
 ASK_ACCESS_KEY = 'Введите ключ доступа:'
@@ -30,9 +33,17 @@ SUCCESSFUL_DELETE_USER = 'Пользователь успешно удален.'
 ASK_SUPPLIER = 'Укажите наименование поставщика:'
 ASK_CONTRACT_TYPE = 'Выберите тип договора:'
 ASK_CLIENT_TYPE = 'Выберите принадлежность клиента:'
+ASK_UNIT = 'Выберете единицу измерения:'
 ASK_INN = 'Укажите ИНН клиента:'
-ASK_AMOUNT = 'Укажите объем вывезенного масла в литрах:'
-ASK_PRICE = 'Укажите цену за литр:'
+
+def ask_amount(unit: Literal['liter', 'kg']) -> str:
+    unit_name = 'литрах' if unit == 'liter' else 'килограммах'
+    return f'Укажите объем вывезенного масла в {unit_name}:'
+
+def ask_price(unit: Literal['liter', 'kg']) -> str:
+    unit_name = 'литр' if unit == 'liter' else 'килограмм'
+    return f'Укажите цену за {unit_name}:'
+
 ASK_CARD = 'Укажите реквизиты для оплаты:'
 ASK_BANK = 'Укажите наименование банка оплаты:'
 WRONG_INTEGER = 'Значение должно быть числом.\nПопробуйте снова:'
@@ -42,8 +53,8 @@ PURCHASE_BASE='''
 Тип договора: {contract_type}
 Клиент: {client_type}
 Поставщик: {supplier}
-Объем (литров): {amount}
-Цена (за литр): {price}
+Объем (литров): {amount:.3f}
+Цена (за литр): {price:.3f}
 ИНН: 
 <code>{inn}</code>
 Реквизиты для оплаты: 
@@ -55,7 +66,7 @@ PURCHASE_NOTIFICATION = '''
 Отправитель: {creator}
 Время: {time}
 
-Полная стоимость: {full_price}
+Полная стоимость: {full_price:.3f}
 ''' + PURCHASE_BASE
 
 SUCCESSFUL_CREATE_PURCHASE = '''

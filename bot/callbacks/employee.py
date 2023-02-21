@@ -1,3 +1,4 @@
+from typing import Literal
 from aiogram.filters.callback_data import CallbackData
 
 
@@ -7,6 +8,10 @@ class MainPageCallback(CallbackData, prefix='employee.main_page'):
 
 class NewPurchaseCallback(CallbackData, prefix='employee.new_purchase'):
     pass
+
+
+class UnitCallback(CallbackData, prefix='employee.new_purchase.unit'):
+    unit: Literal['liter', 'kg']
 
 
 class ContractTypeCallback(CallbackData, prefix='employee.new_purchase.contract_type'):
@@ -27,4 +32,3 @@ class NewFuelingCallback(CallbackData, prefix='employee.new_fueling'):
 
 class FuelingCostCallback(CallbackData, prefix='employee.new_fueling.cost'):
     cost: int
-    
