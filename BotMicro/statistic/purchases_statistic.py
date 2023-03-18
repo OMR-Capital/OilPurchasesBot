@@ -49,14 +49,14 @@ MONTH_STATS_FORMAT = {
 
 def get_purchase_statistic_row(purchase: Purchase) -> list[Any]:
     try:
-        creator = User.get(purchase.creator) # type: ignore
+        creator = User.get(purchase.creator)  # type: ignore
         creator_name = creator.name
     except ItemNotFound:
         creator_name = 'Error'
 
     if purchase.approver:
         try:
-            approver = User.get(purchase.approver) # type: ignore
+            approver = User.get(purchase.approver)  # type: ignore
             approver_name = approver.name
         except ItemNotFound:
             approver_name = 'Error'
@@ -72,10 +72,10 @@ def get_purchase_statistic_row(purchase: Purchase) -> list[Any]:
 
     if purchase.inn:
         purchase.inn = "'" + purchase.inn
-    
+
     if purchase.card:
         purchase.card = "'" + purchase.card
-    
+
     return [
         '', '', '',
         purchase.contract_type,
@@ -95,7 +95,7 @@ def get_purchase_statistic_row(purchase: Purchase) -> list[Any]:
 def get_day_statistic_row(purchases: list[Purchase]) -> list[Any]:
     if not purchases:
         return []
-    
+
     total_amount = sum(purchase.amount for purchase in purchases)
     total_price = sum(purchase.amount * purchase.price for purchase in purchases)
     date = purchases[-1].create_time.strftime('%A %d.%m.%Y')
@@ -105,7 +105,7 @@ def get_day_statistic_row(purchases: list[Purchase]) -> list[Any]:
 def get_week_statistic_row(purchases: list[Purchase]) -> list[Any]:
     if not purchases:
         return []
-    
+
     total_amount = sum(purchase.amount for purchase in purchases)
     total_price = sum(purchase.amount * purchase.price for purchase in purchases)
     begin_date = purchases[-1].create_time.strftime('%d.%m.%Y')
@@ -116,7 +116,7 @@ def get_week_statistic_row(purchases: list[Purchase]) -> list[Any]:
 def get_month_statistic_row(purchases: list[Purchase]) -> list[Any]:
     if not purchases:
         return []
-    
+
     total_amount = sum(purchase.amount for purchase in purchases)
     total_price = sum(purchase.amount * purchase.price for purchase in purchases)
     begin_date = purchases[-1].create_time.strftime('%B %d.%m.%Y')
@@ -158,7 +158,7 @@ def get_purchases_statistic(purchases: list[Purchase]) -> tuple[TableData, Table
             table_data.append(get_month_statistic_row(month_purchases))
             month_rows.append(len(table_data))
             month_purchases = []
-            
+
     day_rows = [len(table_data) - row + 1 for row in day_rows]
     week_rows = [len(table_data) - row + 1 for row in week_rows]
     month_rows = [len(table_data) - row + 1 for row in month_rows]
@@ -181,7 +181,7 @@ def get_purchases_statistic(purchases: list[Purchase]) -> tuple[TableData, Table
         {'range': row_range, 'format': MONTH_STATS_FORMAT}
         for row_range in get_rows_range(month_rows, len(TABLE_HEAD))
     ]
-    
+
     formats = title_formats + day_stats_formats + week_stats_formats + month_stats_formats
     return table_data, formats
 
@@ -189,42 +189,35 @@ def get_purchases_statistic(purchases: list[Purchase]) -> tuple[TableData, Table
 def update_purchases_statistic() -> None:
     sheet_name = getenv('GOOGLE_SHEET_NAME')
     if not sheet_name:
-        return None
-    
+        raise Exception('GOOGLE_SHEET_NAME not specified')
+
     sheet = get_sheet(sheet_name)
     if not sheet:
-        return None
-    
+        raise Exception('Cannot get sheet')
+
     purchases = Purchase.get_all()
 
     # full statistic
     purchases_worksheet = get_worksheet(sheet, 'Закупки')
     if not purchases_worksheet:
-        return None
-        
+        raise Exception('Cannot get worksheet')
+
     table_data, formats = get_purchases_statistic(purchases)
-    try:
-        update_worksheet(purchases_worksheet, table_data, formats)
-    except APIError:
-        return
+    update_worksheet(purchases_worksheet, table_data, formats)
 
     # for each user
     for user_key in set(purchase.creator for purchase in purchases):
         try:
-            creator = User.get(user_key) # type: ignore
+            creator = User.get(user_key)  # type: ignore
             creator_name = creator.name
         except ItemNotFound:
             creator_name = 'Error'
-        
+
         user_purchases = [purchase for purchase in purchases if purchase.creator == user_key]
 
         user_purchases_worksheet = get_worksheet(sheet, creator_name)
         if not user_purchases_worksheet:
             return None
-        
+
         table_data, formats = get_purchases_statistic(user_purchases)
-        try:
-            update_worksheet(user_purchases_worksheet, table_data, formats)
-        except APIError:
-            return
-    
+        update_worksheet(user_purchases_worksheet, table_data, formats)
