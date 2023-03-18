@@ -8,7 +8,6 @@ from web.stubs import BotStub, DispatcherStub, SecretStub
 
 webhook_router = APIRouter(prefix='/webhook', tags=['Telegram Webhook'])
 
-
 @webhook_router.post('')
 async def webhook_route(
     update: Update,
@@ -25,5 +24,5 @@ async def webhook_route(
         response = await dispatcher.feed_update(bot, update=update)
     except Exception as e:
         response = f'{e.__class__.__name__}: {e}'
-        
+
     return {'ok': True, 'response': response}
