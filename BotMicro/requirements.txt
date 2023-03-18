@@ -21,3 +21,5 @@ fastapi
 aiogram_deta
 deta[async]==1.1.0a2
 gspread
+odetam
+ujson
