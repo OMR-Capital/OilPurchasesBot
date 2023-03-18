@@ -20,5 +20,9 @@ micros:
           description: Name of google sheet with statistic
         - name: GOOGLE_SHEET_LINK
           description: Link to statistics sheet
-        - name: DETA_PROJECT_KEY
-          description: For Base connection
+    actions:
+      - id: "update_statistics"
+        name: "UpdatePurchasesStats"
+        description: "Update purchases statistics at sheet"
+        trigger: "schedule"
+        default_interval: "1 minute"
