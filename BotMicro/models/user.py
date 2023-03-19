@@ -9,6 +9,7 @@ class User(DetaModel):
     access_key: str
     name: str
     mode: str
+    area: Optional[str] = None
     chat_id: Optional[int]
 
     class Config:

@@ -4,6 +4,7 @@ from odetam import DetaModel
 
 
 class Purchase(DetaModel):
+    area: Optional[str] = None
     contract_type: str
     client_type: str
     supplier: str
