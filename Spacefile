@@ -25,4 +25,4 @@ micros:
         name: "UpdatePurchasesStats"
         description: "Update purchases statistics at sheet"
         trigger: "schedule"
-        default_interval: "1 minute"
+        default_interval: "15 minute"
