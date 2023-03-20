@@ -16,13 +16,14 @@ class User(DetaModel):
         table_name = 'users'
 
     @classmethod
-    def register_user(cls, name: str, mode: Literal['superuser', 'admin', 'employee']) -> 'User':
+    def register_user(cls, name: str, area: str, mode: Literal['superuser', 'admin', 'employee']) -> 'User':
         access_key = choice(digits) + ''.join(choices(ascii_lowercase + digits, k=6))
 
         user = User(
             access_key=access_key,
             name=name,
-            mode=mode
+            mode=mode,
+            area=area
         )
         user.save()
         return user

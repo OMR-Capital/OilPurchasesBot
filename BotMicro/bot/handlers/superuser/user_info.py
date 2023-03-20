@@ -30,6 +30,7 @@ async def accounts_list_handler(query: CallbackQuery, callback_data: UserInfoCal
         text=messages.USER_INFO.format(
             name=user.name,
             mode=user.mode,
+            area=user.area,
             access_key=user.access_key
         ),
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
