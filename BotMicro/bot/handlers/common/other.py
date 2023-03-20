@@ -6,5 +6,5 @@ router = Router()
 
 
 @router.message()
-async def start_handler(message: Message):
+async def other_handler(message: Message):
     await message.delete()
