@@ -41,7 +41,8 @@ async def new_purchase(message: Message, state: FSMContext) -> Optional[Purchase
         bank=data.get('bank'),
         approved=False,
         creator=creator.key,
-        create_time=datetime.now()
+        create_time=datetime.now(),
+        area=creator.area
     )
     purchase.save()
 
