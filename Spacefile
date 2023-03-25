@@ -26,3 +26,23 @@ micros:
         description: "Update purchases statistics at sheet"
         trigger: "schedule"
         default_interval: "15 minute"
+
+  - name: StatisticMicro
+    src: StatisticMicro
+    engine: python3.9
+    primary: false
+    presets:
+      env:
+        - name: TABLE_NAME
+          description: Name of google sheet
+        - name: PURCHASES_WORKSHEET_NAME
+          description: Name of worksheet with purchases data
+
+    path: statistic
+    public_routes:
+      - "/statistic/openapi.json"
+      - "/statistic/redoc"
+      - "/statistic/docs"
+      - "/openapi.json"
+      - "/redoc"
+      - "/docs"

@@ -1,2 +1,3 @@
-def app(event):
-    return "Hello, world!"
+from api.factory import create_app
+
+app = create_app()
