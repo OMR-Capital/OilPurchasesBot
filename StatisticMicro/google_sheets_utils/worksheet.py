@@ -74,5 +74,5 @@ def sort_by_column(worksheet: Worksheet, column: int, reverse: bool = False):
     """Sort worksheet by column number"""
 
     # A1:ZZ99999 used to skip first frozen row
-    worksheet.sort((column, 'asc' if not reverse else 'des'), range='A1:ZZ99999')
+    worksheet.sort((column, 'asc' if not reverse else 'des'), range='A2:ZZ99999')
                                       
