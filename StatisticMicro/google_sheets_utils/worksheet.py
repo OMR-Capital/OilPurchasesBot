@@ -4,11 +4,15 @@ from gspread.exceptions import WorksheetNotFound
 from gspread.spreadsheet import Spreadsheet
 from gspread.utils import ValueInputOption
 from gspread.worksheet import Worksheet
+from gspread.cell import Cell
+from google_sheets_utils.cells import get_cells_range
 
 from google_sheets_utils.client import get_client
 
 
 def get_worksheet(table_name: str, worksheet_name: str) -> Optional[Worksheet]:
+    """Return worksheet from table by name. If worksheet not found, create new one"""
+
     client = get_client()
     if not client:
         return None
@@ -22,34 +26,53 @@ def get_worksheet(table_name: str, worksheet_name: str) -> Optional[Worksheet]:
     return worksheet
 
 
-def update_header_row(worksheet: Worksheet, header_data: list[Any]):
+def update_header(worksheet: Worksheet, header_data: list[Any]):
+    """Update first line of worksheet with header data"""
+
     worksheet.update(
-        f'A1:L1',
+        get_cells_range(1, 1, len(header_data), 1),
         [header_data],
         value_input_option=ValueInputOption.user_entered
     )
+    worksheet.freeze(rows=1)
 
 
-def add_application_row(worksheet: Worksheet, row_data: list[Any]) -> int:
+def add_row(worksheet: Worksheet, row_data: list[Any]):
+    """Add new row to worksheet"""
+
     worksheet.append_row(row_data, value_input_option=ValueInputOption.user_entered)
-    worksheet.sort((10, 'des'), range='A2:L9999')
     return worksheet.row_count + 1
 
 
-def update_application_row(worksheet: Worksheet, app_key: str, row_data: list[Any]):
-    cell = worksheet.find(app_key, in_column=1, case_sensitive=True)
+def update_row_by_key(worksheet: Worksheet, key: str, row_data: list[Any]) -> Optional[int]:
+    """Update row with specified key in first column. Return row number or None if row not found"""
+
+    cell: Optional[Cell] = worksheet.find(key, in_column=1, case_sensitive=True)
+    if not cell:
+        return None
+
     worksheet.update(
-        f'A{cell.row}:L{cell.row}',
+        get_cells_range(cell.row, 1, len(row_data), 1),
         [row_data],
         value_input_option=ValueInputOption.user_entered
     )
+    return cell.row
 
 
-def clear_application_row(worksheet: Worksheet, app_key: str):
-    cell = worksheet.find(app_key, in_column=1, case_sensitive=True)
-    worksheet.update(
-        f'A{cell.row}:L{cell.row}',
-        [[''] * 12],
-        value_input_option=ValueInputOption.user_entered
-    )
-    worksheet.sort((10, 'des'), range='A2:L9999')
+def remove_row_by_key(worksheet: Worksheet, key: str) -> Optional[int]:
+    """Remove row with specified key in first column. Return row number or None if row not found"""
+
+    cell: Optional[Cell] = worksheet.find(key, in_column=1, case_sensitive=True)
+    if not cell:
+        return None
+
+    worksheet.delete_row(cell.row)
+    return cell.row
+
+
+def sort_by_column(worksheet: Worksheet, column: int, reverse: bool = False):
+    """Sort worksheet by column number"""
+
+    # A1:ZZ99999 used to skip first frozen row
+    worksheet.sort((column, 'asc' if not reverse else 'des'), range='A1:ZZ99999')
+                                      
