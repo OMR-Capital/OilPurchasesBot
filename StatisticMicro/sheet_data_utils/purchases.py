@@ -1,0 +1,39 @@
+from models.purchase import PurchaseStats
+from utils.datetime import datetime_to_str
+
+
+CREATE_TIME_COLUMN = 4 # for sorting in GoogleSheets
+
+PURCHASES_HEADER = [
+    'ID',
+    'Тип договора',
+    'Клиент',
+    'Время создания',
+    'Создатель заявки',
+    'Поставщик',
+    'Объем (в литрах)',
+    'Цена (за литр)',
+    'ИНН',
+    'Счет оплаты',
+    'Регион',
+    'Время одобрения',
+    'Одобривший заявку',
+]
+
+
+def build_purchase_row(purchase: PurchaseStats) -> list[str]:
+    return [
+        purchase.key or '',
+        purchase.contract_type,
+        purchase.client_type,
+        datetime_to_str(purchase.create_time),
+        purchase.creator,
+        purchase.supplier,
+        f'{purchase.amount:.3f}',
+        f'{purchase.price:.3f}',
+        purchase.inn,
+        purchase.card,
+        purchase.area,
+        datetime_to_str(purchase.approve_time) if purchase.approve_time else '',
+        purchase.approver if purchase.approver else '',
+    ]
