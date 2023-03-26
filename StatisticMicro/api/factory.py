@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
 from api.routers import root_router
-from api.stubs import WorksheetStub
-from utils.init_worksheet import init_applications_worksheet
+from api.stubs import PurchasesWorksheetStub
+from utils.init_worksheet import init_purchases_worksheet
 
 
 def create_app() -> FastAPI:
@@ -14,7 +14,7 @@ def create_app() -> FastAPI:
     app.include_router(root_router)
     app.dependency_overrides.update(
         {
-            WorksheetStub: init_applications_worksheet
+            PurchasesWorksheetStub: init_purchases_worksheet
         }
     )
     return app

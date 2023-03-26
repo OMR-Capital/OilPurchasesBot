@@ -1,2 +1,2 @@
-class WorksheetStub:
+class PurchasesWorksheetStub:
     pass

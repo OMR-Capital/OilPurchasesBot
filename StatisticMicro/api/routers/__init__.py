@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 
-from .applications import applications_router
-
+from .purchases import purchases_router
 
 root_router = APIRouter()
-root_router.include_router(applications_router)
+root_router.include_router(purchases_router)
