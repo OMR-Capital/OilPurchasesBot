@@ -19,10 +19,10 @@ MAIN_PAGE = 'Основное меню'
 ACCOUNTS = 'Управление аккаунтами'
 
 USER_INFO = '''
-Имя: {name}
-Статус: {mode}
-Регион: {area}
-Ключ: <code>{access_key}</code>
+<b>Имя</b>: {name}
+<b>Статус</b>: {mode}
+<b>Регион</b>: {area}
+<b>Ключ: <code>{access_key}</code>
 '''
 
 SUCCESSFUL_CREATE_USER = '''
@@ -55,23 +55,23 @@ WRONG_INTEGER = 'Значение должно быть числом.\nПопр�
 
 
 PURCHASE_BASE = ''' 
-Тип договора: {contract_type}
-Клиент: {client_type}
-Поставщик: {supplier}
-Объем (литров): {amount:.3f}
-Цена (за литр): {price:.3f}
-ИНН: 
+<b>Тип договора</b>: {contract_type}
+<b>Клиент</b>: {client_type}
+<b>Поставщик</b>: {supplier}
+<b>Объем (литров)</b>: {amount:.3f}
+<b>Цена (за литр)</b>: {price:.3f}
+<b>ИНН: 
 <code>{inn}</code>
-Реквизиты для оплаты: 
+<b>Реквизиты для оплаты: 
 <code>{card}</code>
-Банк: {bank}
+<b>Банк</b>: {bank}
 '''
 
 PURCHASE_NOTIFICATION = '''
-Отправитель: {creator}
-Время: {time}
+<b>Отправитель</b>: {creator}
+<b>Время</b>: {time}
 
-Полная стоимость: {full_price:.3f}
+<b>Полная стоимость</b>: {full_price:.3f}
 ''' + PURCHASE_BASE
 
 SUCCESSFUL_CREATE_PURCHASE = '''
@@ -82,7 +82,7 @@ SUCCESSFUL_CREATE_PURCHASE = '''
 
 PURCHASE_APPROVED = '''
 Заявка подтверждена.
-Администратор: {approver}
+<b>Администратор</b>: {approver}
 
 ''' + PURCHASE_BASE
 
@@ -99,15 +99,15 @@ TEST = 'TEST'
 ASK_DESTINATION = 'Выберите получателя:'
 
 DISPATCH_BASE = '''
-Назначение: {destination}
-Объем (литров): {amount:.3f}
+<b>Назначение</b>: {destination}
+<b>Объем (литров)</b>: {amount:.3f}
 '''
 
 DISPATCH_NOTIFICATION = '''
-Отправитель: {creator}
-Время: {time}
+<b>Отправитель</b>: {creator}
+<b>Время</b>: {time}
 
-Регион: {area}
+<b>Регион</b>: {area}
 ''' + DISPATCH_BASE
 
 
@@ -115,3 +115,17 @@ SUCCESSFUL_CREATE_DISPATCH = '''
 Отгрузка успешно создана.
 
 ''' + DISPATCH_BASE
+
+
+def amount_statistics(
+    total_purchased_amount: float,
+    total_dispatched_amount: float,
+    areas_amount: dict[str, float]
+) -> str:
+    return f'''
+<b>Общий объем закупленного масла (литры)</b>: {total_purchased_amount:.3f}
+
+<b>Общий объем отгруженного масла (килограммы)</b>: {total_dispatched_amount:.3f}
+
+<b>Объем масла по регионам (литры)</b>:
+''' + '\n'.join(f'{area}: {amount:.3f}' for area, amount in areas_amount.items())

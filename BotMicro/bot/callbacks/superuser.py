@@ -27,3 +27,7 @@ class UserInfoCallback(CallbackData, prefix='superuser.accounts.user_info'):
 
 class RemoveUserCallback(CallbackData, prefix='superuser.accounts.remove_user'):
     key: str
+
+
+class AmountStatisticsCallback(CallbackData, prefix='superuser.amount_statistics'):
+    pass
