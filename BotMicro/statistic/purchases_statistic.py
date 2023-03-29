@@ -33,17 +33,17 @@ TITLE_FORMAT = {
     'horizontalAlignment': 'LEFT'
 }
 DAY_STATS_FORMAT = {
-    'backgroundColor': {'red': 0, 'green': 1, 'blue': 1},
+    'backgroundColor': {'red': 0.8, 'green': 0.66, 'blue': 0.66},
     'textFormat': {'bold': True, 'fontSize': 10},
     'horizontalAlignment': 'LEFT'
 }
 WEEK_STATS_FORMAT = {
-    'backgroundColor': {'red': 1, 'green': 0, 'blue': 1},
+    'backgroundColor': {'red': 0.66, 'green': 0.8, 'blue': 0.66},
     'textFormat': {'bold': True, 'fontSize': 10},
     'horizontalAlignment': 'LEFT'
 }
 MONTH_STATS_FORMAT = {
-    'backgroundColor': {'red': 1, 'green': 1, 'blue': 0},
+    'backgroundColor': {'red': 0.66, 'green': 0.66, 'blue': 0.8},
     'textFormat': {'bold': True, 'fontSize': 10},
     'horizontalAlignment': 'LEFT'
 }

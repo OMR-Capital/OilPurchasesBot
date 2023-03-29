@@ -22,7 +22,7 @@ USER_INFO = '''
 <b>Имя</b>: {name}
 <b>Статус</b>: {mode}
 <b>Регион</b>: {area}
-<b>Ключ: <code>{access_key}</code>
+Ключ: <code>{access_key}</code>
 '''
 
 SUCCESSFUL_CREATE_USER = '''
