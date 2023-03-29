@@ -32,3 +32,19 @@ class NewFuelingCallback(CallbackData, prefix='employee.new_fueling'):
 
 class FuelingCostCallback(CallbackData, prefix='employee.new_fueling.cost'):
     cost: int
+
+
+class NewDispatchCallback(CallbackData, prefix='new_dis'):
+    pass
+
+
+class DestinationCallback(CallbackData, prefix='dis.dest'):
+    destination: str
+    
+
+class ConfirmDispatchCallback(CallbackData, prefix='dis.conf'):
+    pass
+
+
+class HideDispatchCallback(CallbackData, prefix='hide_dis'):
+    pass

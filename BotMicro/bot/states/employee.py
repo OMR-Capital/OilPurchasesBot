@@ -13,6 +13,13 @@ class NewPurchaseState(StatesGroup):
     bank = State()
 
 
+class NewDispatchState(StatesGroup):
+    destination = State()
+    unit = State()
+    amount = State()
+    confirm = State()
+
+
 class NewFueling(StatesGroup):
     cost = State()
-    
+     

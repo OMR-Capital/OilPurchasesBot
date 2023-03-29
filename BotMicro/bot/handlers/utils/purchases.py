@@ -56,8 +56,7 @@ async def spread_purchase(purchase: Purchase, creator: User):
         return
 
     spread = Spread(key=purchase.key, messages=[])
-    admins = User.query((User.mode == 'admin') | (
-        User.mode == 'superuser'))  # type: ignore
+    admins = User.query((User.mode == 'admin') | (User.mode == 'superuser'))  # type: ignore
     for admin in admins:
         try:
             create_time = purchase.create_time.astimezone(MSC_TZ)

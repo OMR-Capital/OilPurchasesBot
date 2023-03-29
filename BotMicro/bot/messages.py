@@ -38,20 +38,23 @@ ASK_CLIENT_TYPE = 'Выберите принадлежность клиента:
 ASK_UNIT = 'Выберете единицу измерения:'
 ASK_INN = 'Укажите ИНН клиента:'
 
+
 def ask_amount(unit: Literal['liter', 'kg']) -> str:
     unit_name = 'литрах' if unit == 'liter' else 'килограммах'
     return f'Укажите объем вывезенного масла в {unit_name}:'
 
+
 def ask_price(unit: Literal['liter', 'kg']) -> str:
     unit_name = 'литр' if unit == 'liter' else 'килограмм'
     return f'Укажите цену за {unit_name}:'
+
 
 ASK_CARD = 'Укажите реквизиты для оплаты:'
 ASK_BANK = 'Укажите наименование банка оплаты:'
 WRONG_INTEGER = 'Значение должно быть числом.\nПопробуйте снова:'
 
 
-PURCHASE_BASE=''' 
+PURCHASE_BASE = ''' 
 Тип договора: {contract_type}
 Клиент: {client_type}
 Поставщик: {supplier}
@@ -85,9 +88,30 @@ PURCHASE_APPROVED = '''
 
 SUCCESSFUL_MAKE_STATISTIC = 'Отчет успешно создан.'
 
-ASK_FUELING_COST = 'Укажите стоимость заправки:' 
+ASK_FUELING_COST = 'Укажите стоимость заправки:'
 SUCCESSFUL_CREATE_FUELING = 'Запись о заправке успешно добавлена.'
 
-ERROR = 'Произошла какая-то ошибка. Попробуйте снова.' 
+ERROR = 'Произошла какая-то ошибка. Попробуйте снова.'
 
-TEST='TEST'
+TEST = 'TEST'
+
+
+ASK_DESTINATION = 'Выберите получателя:'
+
+DISPATCH_BASE = '''
+Назначение: {destination}
+Объем (литров): {amount:.3f}
+'''
+
+DISPATCH_NOTIFICATION = '''
+Отправитель: {creator}
+Время: {time}
+
+Регион: {area}
+''' + DISPATCH_BASE
+
+
+SUCCESSFUL_CREATE_DISPATCH = '''
+Отгрузка успешно создана.
+
+''' + DISPATCH_BASE

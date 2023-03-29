@@ -7,5 +7,6 @@ router = Router()
 
 @router.errors()
 async def errors_handler(event: ErrorEvent):
-    logging.warning(event)
+    logger = logging.getLogger(__name__)
+    logger.warning(event)
     return event
