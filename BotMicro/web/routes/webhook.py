@@ -1,3 +1,4 @@
+import logging
 from aiogram import Bot, Dispatcher
 from aiogram.types import Update
 from fastapi import APIRouter, Depends, Header, HTTPException
@@ -22,4 +23,7 @@ async def webhook_route(
 
 
     response = await dispatcher.feed_update(bot, update=update)
+    
+    logger = logging.getLogger(__name__)
+    logger.warning(f'Update dispatched: {response}')
     return {'ok': True, 'response': response}

@@ -2,4 +2,4 @@ aiogram==3.0.0b6
 aiogram_deta
 deta[async]==1.1.0a2
 gspread
-odetam @ git+https://github.com/mamsdeveloper/ODetaM.git@tuned-origin
+odetam
