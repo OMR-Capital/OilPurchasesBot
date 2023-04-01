@@ -31,14 +31,11 @@ async def new_dispatch_handler(query: CallbackQuery,  callback_data: NewDispatch
     await message.edit_text(
         messages.ASK_DESTINATION,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [
-                InlineKeyboardButton(text='Склад Саратов', callback_data=DestinationCallback(destination='Склад Саратов').pack()),
-                InlineKeyboardButton(text='ООО "СПС"', callback_data=DestinationCallback(destination='ООО "СПС"').pack()),
-                InlineKeyboardButton(text='ООО "НПО "ХимБурНефть"', callback_data=DestinationCallback(destination='ООО "НПО "ХимБурНефть"').pack()),
-                InlineKeyboardButton(text='ООО "СпецАвтомат"', callback_data=DestinationCallback(destination='ООО "СпецАвтомат"').pack()),
-            ],
-        ] + cancel_kb.inline_keyboard
-        )
+            [InlineKeyboardButton(text='Склад Саратов', callback_data=DestinationCallback(destination='Склад Саратов').pack())],
+            [InlineKeyboardButton(text='ООО "СПС"', callback_data=DestinationCallback(destination='ООО "СПС"').pack())],
+            [InlineKeyboardButton(text='ООО "НПО "ХимБурНефть"', callback_data=DestinationCallback(destination='ООО "НПО "ХимБурНефть"').pack())],
+            [InlineKeyboardButton(text='ООО "СпецАвтомат"', callback_data=DestinationCallback(destination='ООО "СпецАвтомат"').pack())],
+        ] + cancel_kb.inline_keyboard)
     )
     await state.update_data(init_message_id=message.message_id)
     await state.set_state(NewDispatchState.destination)
@@ -63,7 +60,6 @@ async def destination_handler(query: CallbackQuery, callback_data: DestinationCa
     )
     await state.update_data(destination=callback_data.destination)
     await state.set_state(NewDispatchState.unit)
-
 
 
 @router.callback_query(NewDispatchState.unit, UnitCallback.filter())
