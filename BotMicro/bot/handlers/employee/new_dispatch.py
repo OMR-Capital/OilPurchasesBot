@@ -33,7 +33,9 @@ async def new_dispatch_handler(query: CallbackQuery,  callback_data: NewDispatch
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [
                 InlineKeyboardButton(text='Склад Саратов', callback_data=DestinationCallback(destination='Склад Саратов').pack()),
-                InlineKeyboardButton(text='Завод Покупателя', callback_data=DestinationCallback(destination='Завод Покупателя').pack())
+                InlineKeyboardButton(text='ООО "СПС"', callback_data=DestinationCallback(destination='ООО "СПС"').pack()),
+                InlineKeyboardButton(text='ООО "НПО "ХимБурНефть"', callback_data=DestinationCallback(destination='ООО "НПО "ХимБурНефть"').pack()),
+                InlineKeyboardButton(text='ООО "СпецАвтомат"', callback_data=DestinationCallback(destination='ООО "СпецАвтомат"').pack()),
             ],
         ] + cancel_kb.inline_keyboard
         )
@@ -50,7 +52,7 @@ async def destination_handler(query: CallbackQuery, callback_data: DestinationCa
     if not message:
         return
 
-    unit = 'kg' if callback_data.destination == 'Завод Покупателя' else 'liter'
+    unit = 'kg' if callback_data.destination == 'ООО "СПС"' else 'liter'
     await message.edit_text(
         messages.ask_amount(unit),
         reply_markup=cancel_kb
