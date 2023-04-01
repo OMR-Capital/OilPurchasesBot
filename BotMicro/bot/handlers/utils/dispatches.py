@@ -35,8 +35,7 @@ async def new_dispatch(message: Message, bot: Bot, state: FSMContext) -> Optiona
 
 
 async def spread_dispatch(dispatch: Dispatch, creator: User, bot: Bot):
-    # admins = User.query((User.mode == 'admin') | (User.mode == 'superuser'))  # type: ignore
-    admins = User.query(User.mode == 'superuser')  # type: ignore
+    admins = User.query((User.mode == 'admin') | (User.mode == 'superuser'))  # type: ignore
     for admin in admins:
         try:
             create_time = dispatch.create_time.astimezone(MSC_TZ)
