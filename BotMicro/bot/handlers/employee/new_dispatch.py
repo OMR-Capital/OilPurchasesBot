@@ -5,7 +5,7 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
 
 from bot import messages
 from bot.callbacks.employee import (ConfirmDispatchCallback, MainPageCallback,
-                                    DestinationCallback, NewDispatchCallback)
+                                    DestinationCallback, NewDispatchCallback, UnitCallback)
 from bot.handlers.utils.chat import error
 from bot.handlers.utils.dispatches import new_dispatch
 from bot.handlers.utils.message_edit import get_init_message_id
@@ -52,12 +52,33 @@ async def destination_handler(query: CallbackQuery, callback_data: DestinationCa
     if not message:
         return
 
-    unit = 'kg' if callback_data.destination == 'ООО "СПС"' else 'liter'
     await message.edit_text(
-        messages.ask_amount(unit),
+        text=messages.ASK_UNIT,
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [
+                InlineKeyboardButton(text='Литры', callback_data=UnitCallback(unit='liter').pack()),
+                InlineKeyboardButton(text='Килограммы', callback_data=UnitCallback(unit='kg').pack())
+            ],
+        ] + cancel_kb.inline_keyboard)
+    )
+    await state.update_data(destination=callback_data.destination)
+    await state.set_state(NewDispatchState.unit)
+
+
+
+@router.callback_query(NewDispatchState.unit, UnitCallback.filter())
+async def unit_handler(query: CallbackQuery, callback_data: UnitCallback, state: FSMContext):
+    await query.answer()
+
+    message = query.message
+    if not message:
+        return
+
+    await message.edit_text(
+        messages.ask_amount(callback_data.unit),
         reply_markup=cancel_kb
     )
-    await state.update_data(destination=callback_data.destination, unit=unit)
+    await state.update_data(unit=callback_data.unit)
     await state.set_state(NewDispatchState.amount)
 
 
