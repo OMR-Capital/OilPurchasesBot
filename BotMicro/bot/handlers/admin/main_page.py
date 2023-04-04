@@ -28,7 +28,7 @@ async def open_main_page(message: Message):
         messages.MAIN_PAGE,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text='Статистика', url=getenv('GOOGLE_SHEET_LINK', ''))],
-            [InlineKeyboardButton(text='Статистика объемов', callback_data=AmountStatisticsCallback().pack())],
+            [InlineKeyboardButton(text='Статистика объемов', callback_data=AmountStatisticsCallback(user_mode='admin').pack())],
         ])
     )
 

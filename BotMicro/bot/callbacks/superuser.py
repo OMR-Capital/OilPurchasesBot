@@ -30,4 +30,4 @@ class RemoveUserCallback(CallbackData, prefix='superuser.accounts.remove_user'):
 
 
 class AmountStatisticsCallback(CallbackData, prefix='superuser.amount_statistics'):
-    pass
+    user_mode: str

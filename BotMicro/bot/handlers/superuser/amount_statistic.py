@@ -3,12 +3,29 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import (CallbackQuery, InlineKeyboardButton,
                            InlineKeyboardMarkup)
 
-from bot.callbacks.superuser import AmountStatisticsCallback, MainPageCallback
+from bot.callbacks.superuser import AmountStatisticsCallback
+from bot.callbacks.superuser import MainPageCallback as superuser_menu_callback
+from bot.callbacks.admin import MainPageCallback as admin_menu_callback
+
 from bot.messages import amount_statistics
 from models.dispatch import Dispatch
 from models.purchase import Purchase
 
 router = Router()
+
+
+def get_areas_amount(
+    areas: set[str],
+    area_to_purchases: dict[str, list[Purchase]],
+    area_to_dispatches: dict[str, list[Dispatch]]
+) -> dict[str, float]:
+    areas_amount: dict[str, float] = {}
+    for area in areas:
+        purchased_amount = sum(purchase.amount for purchase in area_to_purchases[area])
+        dispatched_amount = sum(dispatch.amount for dispatch in area_to_dispatches[area])
+        areas_amount[area] = purchased_amount - dispatched_amount
+
+    return areas_amount
 
 
 @router.callback_query(AmountStatisticsCallback.filter())
@@ -35,10 +52,9 @@ async def amount_statistic_handler(query: CallbackQuery, callback_data: AmountSt
 
     total_purchased_amount = sum(purchase.amount for purchase in purchases)
     total_dispatched_amount = sum(dispatch.amount for dispatch in dispatches) * 0.88
-    areas_amount = {
-        area: sum(purchase.amount for purchase in area_to_purchases[area]) -
-        sum(dispatch.amount for dispatch in area_to_dispatches[area]) for area in areas}
+    areas_amount = get_areas_amount(areas, area_to_purchases, area_to_dispatches)
 
+    menu_callback = superuser_menu_callback if callback_data.user_mode == 'superuser' else admin_menu_callback
     await message.edit_text(
         text=amount_statistics(
             total_purchased_amount,
@@ -46,6 +62,11 @@ async def amount_statistic_handler(query: CallbackQuery, callback_data: AmountSt
             areas_amount
         ),
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='Назад', callback_data=MainPageCallback().pack())]
+            [
+                InlineKeyboardButton(
+                    text='Назад',
+                    callback_data=menu_callback().pack()
+                )
+            ]
         ])
     )
