@@ -1,0 +1,48 @@
+# Spacefile Docs: https://go.deta.dev/docs/spacefile/v0
+v: 0
+micros:
+  - name: BotMicro
+    src: BotMicro
+    engine: python3.9
+    primary: true
+    public_routes:
+      - "/webhook"
+      - "/webhook/*"
+    presets:
+      env:
+        - name: BOT_TOKEN
+          description: Secret token of telegram bot
+        - name: TELEGRAM_SECRET
+          description: Secret value for telegram webhook
+        - name: ROOT_USERNAME
+          description: Username of root user
+        - name: GOOGLE_SHEET_NAME
+          description: Name of google sheet with statistic
+        - name: GOOGLE_SHEET_LINK
+          description: Link to statistics sheet
+    actions:
+      - id: "update_statistics"
+        name: "UpdatePurchasesStats"
+        description: "Update purchases statistics at sheet"
+        trigger: "schedule"
+        default_interval: "15 minute"
+
+  - name: StatisticMicro
+    src: StatisticMicro
+    engine: python3.9
+    primary: false
+    presets:
+      env:
+        - name: TABLE_NAME
+          description: Name of google sheet
+        - name: PURCHASES_WORKSHEET_NAME
+          description: Name of worksheet with purchases data
+
+    path: statistic
+    public_routes:
+      - "/statistic/openapi.json"
+      - "/statistic/redoc"
+      - "/statistic/docs"
+      - "/openapi.json"
+      - "/redoc"
+      - "/docs"

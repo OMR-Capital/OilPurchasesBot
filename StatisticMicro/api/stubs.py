@@ -1,0 +1,2 @@
+class PurchasesWorksheetStub:
+    pass
