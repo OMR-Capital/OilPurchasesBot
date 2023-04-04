@@ -1,37 +1,48 @@
-# Purchases Bot
+# Oil Purchases Bot
 
 ## Description
 
-This bot help to manage purchases for retail company.
+That Telegram bot helps manage purchases, dispatches, and sailing of waste oil for retail companies. It is designed to automate the process of purchasing waste oil, dispatching it to the company's warehouse, and sailing it to the customer. The bot is designed to be used by employees of the company, who can create purchase applications and dispatches, and by the company's management, who can approve purchases and set up the sailing of oil dispatches.
 
-There are three roles:
+The bot supports three different roles with unique functions and permissions:
+1. The Superuser creates and deletes accounts and has access to administrative functionalities. 
+2. The Admin views purchase statistics and approves purchases made by employees and sets up the sailing of oil dispatches. 
+3. The Employee creates new purchase applications and dispatches, ensuring the process is executed seamlessly.
 
-1. Superuser - can create and delete admins and employees, also has all admin functionality.
-2. Admin - can see statistic of purchases and approve purchases from employees.
-3. Employee - can create new purchases applications.
+To access the bot's functionalities, users need to call the login form using the /start command and then login with a specific access key, ensuring authorized access.
 
-To get access for functionality of one of this roles you should call login form by `/start` command and then login with specific access key
+This Telegram bot is an effective solution for managing the purchases, dispatching, and sailing of waste oil for retail companies. Its streamlined functionalities and user-friendly interface can improve the efficiency and productivity of businesses, leading to better profits and growth.
+
+The bot is an example of how Telegram bots can solve complex business tasks, highlighting the benefits of using such solutions. It can serve as a starting point for building customized solutions, saving time and effort in development.
+
+The bot is hosted on the [Deta Space](https://deta.space/) cloud platform, designed for building, deploying, and scaling web applications and APIs. Deta Space provides developers with powerful tools and services, such as automated deployment, version control, and performance monitoring, making it easier to build and manage complex applications.
+
 
 ## Deployment
 
-1. Create bot via BotFather
-2. Click on `Deploy to Deta`
+### Prerequisites
+Before deploying the Telegram bot, ensure the following prerequisites are met:
 
-    [![Deploy](https://button.deta.dev/1/svg)](https://go.deta.dev/deploy?repo=https://github.com/mamsdeveloper/PurchasesBot)
-3. Enter env variables (GOOGLE section may be skipped)
-4. Set webhook:
+1. Create a Telegram bot via [@BotFather](https://t.me/BotFather) and obtain a token.
+2. Create a new or use an existing Google Sheet for purchases statistics.
+3. Create a service account for Google Sheet and obtain the credentials file ([see](https://console.cloud.google.com)).
 
-    ```bash
-        curl -X POST https://api.telegram.org/bot<TELEGRAM_TOKEN>/setWebhook
-    -H "Content-Type: application/json"
-    -d '{"url": "https://<example-bot>.deta.sh/webhook", "secret_token": "<TELEGRAM_SECRET>"}'
-    ```
+### Deploy
+To deploy the Telegram bot, follow these steps:
 
-5. Create new superuser with `/create_root`. Enjoy!
-6. For activate statistics at GoogleSheets create secret key file by that [instruction](https://docs.gspread.org/en/latest/oauth2.html#enable-api-access-for-a-project) and then load it to DetaStorage by **bot/statistics/google_sheets/load_key_file** or by another way. Create Google spreadsheet and add just created service account to editors.
+1. Create a developer account on [Deta Space](https://deta.space/).
+2. Install the [Space CLI](https://deta.space/docs/en/basics/cli).
+3. Clone the project using the command `git clone https://github.com/OMR-Capital/OilPurchasesBot.git`.
+4. Add the credentials file to the project directory.
+5. In the project directory, run `space new` and follow the instructions.
+6. Open the project in the [Builder](https://deta.space/builder).
+7. In the `Configuration` tab, specify the settings with your Telegram bot token and Google Sheet data.
+8. Set up the Telegram webhook (refer to the [Telegram docs](https://core.telegram.org/bots/api#setwebhook)) with the URL from `Builder` and token from `BotFather`. Note: You must specify `TELEGRAM_SECRET` in the `Configuration` tab of `Builder` before setting up the webhook and use it in the webhook.
+9. Type `/start` in the Telegram chat with your bot and enjoy!
+
+> To get access to the first superuser, use the `/create_root` command from the account specified in `ROOT_USERNAME`.
 
 ## Thanks
 
-[aiogram](https://github.com/aiogram)
+This project was created with [Deta Space](https://deta.space/), [ODetaM](https://github.com/rickh94/ODetaM) and [aiogram](https://github.com/aiogram/aiogram) 
 
-[Deta](https://github.com/deta)
