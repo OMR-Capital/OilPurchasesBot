@@ -32,6 +32,13 @@ SUCCESSFUL_CREATE_USER = '''
 ACCOUNTS_LIST = 'Нажмите на пользователя, чтобы посмотреть данные и статистику или удалить.'
 SUCCESSFUL_DELETE_USER = 'Пользователь успешно удален.'
 
+ACQUIRERS = 'Управление покупателями'
+ACQUIRERS_LIST = 'Покупатели (нажмите на кнопку покупателя, чтобы удалить его):'
+ASK_ACQUIRER_NAME = 'Укажите наименование покупателя:'
+ASK_CONFIRM_DELETE_ACQUIRER = 'Вы уверены, что хотите удалить покупателя ?'
+SUCCESSFUL_CREATE_ACQUIRER = 'Новый покупатель добавлен: {name}'
+SUCCESSFUL_DELETE_ACQUIRER = 'Покупатель успешно удален.'
+
 ASK_SUPPLIER = 'Укажите наименование поставщика:'
 ASK_CONTRACT_TYPE = 'Выберите тип договора:'
 ASK_CLIENT_TYPE = 'Выберите принадлежность клиента:'
