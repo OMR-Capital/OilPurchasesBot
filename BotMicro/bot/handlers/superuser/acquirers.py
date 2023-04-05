@@ -94,7 +94,7 @@ async def acquirers_list_handlers(query: CallbackQuery, callback_data: Acquirers
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text=f'❌ {acquirer.name}',
+                    text= f'{acquirer.name}  ❌',
                     callback_data=DeleteAcquirerCallback(acquirer_key=acquirer.key).pack()
                 ),
             ]
