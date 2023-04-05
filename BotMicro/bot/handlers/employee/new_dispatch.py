@@ -17,14 +17,8 @@ router = Router()
 
 
 @router.callback_query(NewDispatchCallback.filter())
-async def new_dispatch_handler(query: CallbackQuery,  callback_data: NewDispatchCallback, bot: Bot, state: FSMContext):
-    await query.answer()
-
-    message = query.message
-    if not message:
-        return
-
-    acquirers = Acquirer.query(Acquirer.deleted == False)
+async def new_dispatch_handler(query: CallbackQuery, message: Message, callback_data: NewDispatchCallback, bot: Bot, state: FSMContext):
+    acquirers = Acquirer.query(Acquirer.deleted == False) # type: ignore
 
     await message.edit_text(
         messages.ASK_ACQUIRER,
@@ -43,17 +37,11 @@ async def new_dispatch_handler(query: CallbackQuery,  callback_data: NewDispatch
 
 
 @router.callback_query(NewDispatchState.acquirer, AcquirerCallback.filter())
-async def acquirer_handler(query: CallbackQuery, callback_data: AcquirerCallback, state: FSMContext):
-    await query.answer()
-
-    message = query.message
-    if not message:
-        return
-
+async def acquirer_handler(query: CallbackQuery, message: Message, callback_data: AcquirerCallback, state: FSMContext):
     acquirer = Acquirer.get_or_none(callback_data.acquirer_key)
     if not acquirer:
         return
-    
+
     await message.edit_text(
         text=messages.ASK_UNIT,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
@@ -72,13 +60,7 @@ async def acquirer_handler(query: CallbackQuery, callback_data: AcquirerCallback
 
 
 @router.callback_query(NewDispatchState.unit, UnitCallback.filter())
-async def unit_handler(query: CallbackQuery, callback_data: UnitCallback, state: FSMContext):
-    await query.answer()
-
-    message = query.message
-    if not message:
-        return
-
+async def unit_handler(query: CallbackQuery, message: Message, callback_data: UnitCallback, state: FSMContext):
     await message.edit_text(
         messages.ask_amount(callback_data.unit),
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
@@ -146,13 +128,7 @@ async def wrong_amount_handler(message: Message, bot: Bot, state: FSMContext):
 
 
 @router.callback_query(NewDispatchState.confirm, ConfirmDispatchCallback.filter())
-async def confirm_handler(query: CallbackQuery, callback_data: ConfirmDispatchCallback, bot: Bot, state: FSMContext):
-    await query.answer()
-
-    message = query.message
-    if not message:
-        return
-
+async def confirm_handler(query: CallbackQuery, message: Message, callback_data: ConfirmDispatchCallback, bot: Bot, state: FSMContext):
     await create_new_dispatch(message, bot, state)
     await state.clear()
 
@@ -162,7 +138,7 @@ async def create_new_dispatch(message: Message, bot: Bot, state: FSMContext):
     if not init_message_id:
         return
 
-    data = await state.get_data() 
+    data = await state.get_data()
 
     dispatch = await new_dispatch(message, bot, state)
     if dispatch is None:

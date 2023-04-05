@@ -1,8 +1,5 @@
-import logging
 from os import getenv
 from typing import Any
-
-from gspread.exceptions import APIError
 
 from models import Purchase, User
 from odetam.exceptions import ItemNotFound
@@ -190,8 +187,6 @@ def get_purchases_statistic(purchases: list[Purchase]) -> tuple[TableData, Table
 
 
 def update_purchases_statistic() -> None:
-    logging.warning('Purchases updating')
-
     sheet_name = getenv('GOOGLE_SHEET_NAME')
     if not sheet_name:
         raise Exception('GOOGLE_SHEET_NAME not specified')
@@ -209,7 +204,6 @@ def update_purchases_statistic() -> None:
 
     table_data, formats = get_purchases_statistic(purchases)
     update_worksheet(purchases_worksheet, table_data, formats)
-    logging.warning('Purchases updated')
     # for each user
     for user_key in set(purchase.creator for purchase in purchases):
         try:

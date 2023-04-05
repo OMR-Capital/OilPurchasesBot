@@ -13,13 +13,7 @@ router = Router()
 
 
 @router.callback_query(LoginCallback.filter())
-async def login_handler(query: CallbackQuery, state: FSMContext):
-    await query.answer()  
-
-    message = query.message
-    if not message:
-        return
-
+async def login_handler(query: CallbackQuery, message: Message, state: FSMContext):
     await message.edit_text(messages.ASK_ACCESS_KEY, reply_markup=None)
     await state.update_data(init_message_id=message.message_id)
     await state.set_state(LoginState.access_key)
@@ -31,7 +25,7 @@ async def access_key_handler(message: Message, state: FSMContext):
 
     init_message_id = await get_init_message_id(state)
     if not init_message_id:
-        return 
+        return
 
     access_key = message.text or ''
     user = User.login_user(access_key, message.chat.id)
@@ -39,7 +33,7 @@ async def access_key_handler(message: Message, state: FSMContext):
     if not user:
         await edit_message(message.chat.id, init_message_id, messages.WRONG_ACCESS_KEY)
         return
-    
+
     if user.mode == 'superuser':
         await superuser.greet(message.chat.id, init_message_id, user)
     elif user.mode == 'admin':
@@ -48,5 +42,3 @@ async def access_key_handler(message: Message, state: FSMContext):
         await employee.greet(message.chat.id, init_message_id, user)
 
     await state.clear()
-    
-    

@@ -2,24 +2,19 @@ from os import getenv
 
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import (CallbackQuery, InlineKeyboardButton,
+                           InlineKeyboardMarkup, Message)
 
-from bot.callbacks.admin import MainPageCallback
 from bot import messages
+from bot.callbacks.admin import MainPageCallback
 from bot.callbacks.superuser import AmountStatisticsCallback
 
 router = Router()
 
 
 @router.callback_query(MainPageCallback.filter())
-async def main_page_handler(query: CallbackQuery, state: FSMContext):
-    await query.answer()
+async def main_page_handler(query: CallbackQuery, message: Message, state: FSMContext):
     await state.clear()
-
-    message = query.message
-    if not message:
-        return
-
     await open_main_page(message)
 
 
@@ -31,4 +26,3 @@ async def open_main_page(message: Message):
             [InlineKeyboardButton(text='Статистика объемов', callback_data=AmountStatisticsCallback(user_mode='admin').pack())],
         ])
     )
-

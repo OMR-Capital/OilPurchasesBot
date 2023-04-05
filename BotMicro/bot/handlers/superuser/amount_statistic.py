@@ -1,12 +1,11 @@
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import (CallbackQuery, InlineKeyboardButton,
-                           InlineKeyboardMarkup)
+                           InlineKeyboardMarkup, Message)
 
+from bot.callbacks.admin import MainPageCallback as admin_menu_callback
 from bot.callbacks.superuser import AmountStatisticsCallback
 from bot.callbacks.superuser import MainPageCallback as superuser_menu_callback
-from bot.callbacks.admin import MainPageCallback as admin_menu_callback
-
 from bot.messages import amount_statistics
 from models.dispatch import Dispatch
 from models.purchase import Purchase
@@ -29,14 +28,8 @@ def get_areas_amount(
 
 
 @router.callback_query(AmountStatisticsCallback.filter())
-async def amount_statistic_handler(query: CallbackQuery, callback_data: AmountStatisticsCallback, state: FSMContext):
-    await query.answer()
-
-    message = query.message
-    if not message:
-        return
-
-    purchases = Purchase.query(Purchase.approved == True)
+async def amount_statistic_handler(query: CallbackQuery, message: Message, callback_data: AmountStatisticsCallback, state: FSMContext):
+    purchases = Purchase.query(Purchase.approved == True)  # type: ignore
 
     areas = set(purchase.area for purchase in purchases if purchase.area)
     area_to_purchases = {

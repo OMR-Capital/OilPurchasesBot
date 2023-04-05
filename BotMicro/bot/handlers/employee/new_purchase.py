@@ -5,7 +5,8 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
 
 from bot import messages
 from bot.callbacks.employee import (ClientTypeCallback, ContractTypeCallback,
-                                    MainPageCallback, NewPurchaseCallback, UnitCallback)
+                                    MainPageCallback, NewPurchaseCallback,
+                                    UnitCallback)
 from bot.handlers.utils import edit_message, get_init_message_id
 from bot.handlers.utils.chat import error
 from bot.handlers.utils.purchases import new_purchase
@@ -20,13 +21,7 @@ cancel_kb = InlineKeyboardMarkup(inline_keyboard=[
 
 
 @router.callback_query(NewPurchaseCallback.filter())
-async def new_purchase_handler(query: CallbackQuery, state: FSMContext):
-    await query.answer()
-
-    message = query.message
-    if not message:
-        return
-
+async def new_purchase_handler(query: CallbackQuery, message: Message, state: FSMContext):
     await message.edit_text(
         messages.ASK_CONTRACT_TYPE,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
@@ -42,13 +37,7 @@ async def new_purchase_handler(query: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(NewPurchaseState.contract_type, ContractTypeCallback.filter())
-async def contract_type_handler(query: CallbackQuery, callback_data: ContractTypeCallback, state: FSMContext):
-    await query.answer()
-
-    message = query.message
-    if not message:
-        return
-
+async def contract_type_handler(query: CallbackQuery, message: Message, callback_data: ContractTypeCallback, state: FSMContext):
     await message.edit_text(
         messages.ASK_CLIENT_TYPE,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
@@ -64,13 +53,7 @@ async def contract_type_handler(query: CallbackQuery, callback_data: ContractTyp
 
 
 @router.callback_query(NewPurchaseState.client_type, ClientTypeCallback.filter())
-async def client_type_handler(query: CallbackQuery, callback_data: ClientTypeCallback, state: FSMContext):
-    await query.answer()
-
-    message = query.message
-    if not message:
-        return
-
+async def client_type_handler(query: CallbackQuery, message: Message, callback_data: ClientTypeCallback, state: FSMContext):
     await message.edit_text(
         messages.ASK_SUPPLIER,
         reply_markup=cancel_kb
@@ -106,13 +89,7 @@ async def supplier_handler(message: Message, state: FSMContext):
 
 
 @router.callback_query(NewPurchaseState.unit, UnitCallback.filter())
-async def unit_handler(query: CallbackQuery, callback_data: UnitCallback, state: FSMContext):
-    await query.answer()
-
-    message = query.message
-    if not message:
-        return
-
+async def unit_handler(query: CallbackQuery, message: Message, callback_data: UnitCallback, state: FSMContext):
     await message.edit_text(
         messages.ask_amount(callback_data.unit),
         reply_markup=cancel_kb
@@ -229,7 +206,7 @@ async def create_new_purchase(message: Message, state: FSMContext):
     if purchase is None:
         await error(message.chat.id, init_message_id, MainPageCallback().pack())
         return
-    
+
     await edit_message(
         message.chat.id,
         init_message_id,

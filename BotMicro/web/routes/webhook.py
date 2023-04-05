@@ -1,4 +1,3 @@
-import logging
 from aiogram import Bot, Dispatcher
 from aiogram.types import Update
 from fastapi import APIRouter, Depends, Header, HTTPException
@@ -18,12 +17,10 @@ async def webhook_route(
     dispatcher: Dispatcher = Depends(DispatcherStub),
 ):
     if secret.get_secret_value() != expected_secret:
-        raise HTTPException(detail='Invalid secret',
-                            status_code=status.HTTP_401_UNAUTHORIZED)
-
+        raise HTTPException(
+            detail='Invalid secret',
+            status_code=status.HTTP_401_UNAUTHORIZED
+        )
 
     response = await dispatcher.feed_update(bot, update=update)
-    
-    logger = logging.getLogger(__name__)
-    logger.warning(f'Update dispatched: {response}')
     return {'ok': True, 'response': response}

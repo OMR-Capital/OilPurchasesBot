@@ -1,23 +1,19 @@
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import (CallbackQuery, InlineKeyboardButton,
-                           InlineKeyboardMarkup)
+                           InlineKeyboardMarkup, Message)
 
-from bot.callbacks.superuser import AccountsCallback, AccountsListCallback, UserInfoCallback
 from bot import messages
+from bot.callbacks.superuser import (AccountsCallback, AccountsListCallback,
+                                     UserInfoCallback)
 from models import User
 
 router = Router()
 
 
 @router.callback_query(AccountsListCallback.filter())
-async def accounts_list_handler(query: CallbackQuery, state: FSMContext):
-    await query.answer()
+async def accounts_list_handler(query: CallbackQuery, message: Message, state: FSMContext):
     await state.clear()
-
-    message = query.message
-    if not message:
-        return
 
     users = User.query(User.mode.not_contains('superuser'))  # type: ignore
     users_list_kb = build_users_list_kb(users)

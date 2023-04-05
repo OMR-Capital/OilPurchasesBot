@@ -1,7 +1,7 @@
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import (CallbackQuery, InlineKeyboardButton,
-                           InlineKeyboardMarkup)
+                           InlineKeyboardMarkup, Message)
 
 from bot import messages
 from bot.callbacks.employee import (FuelingCostCallback, MainPageCallback,
@@ -12,19 +12,11 @@ from bot.handlers.utils.message_edit import edit_message, get_init_message_id
 from bot.states.employee import NewFueling
 from statistic.fuelings_statistic import update_fuelings_statistic
 
-
 router = Router()
 
 
 @router.callback_query(NewFuelingCallback.filter())
-async def new_fueling_handler(query: CallbackQuery, state: FSMContext):
-    await query.answer()
-    await state.clear()
-
-    message = query.message
-    if not message:
-        return
-
+async def new_fueling_handler(query: CallbackQuery, message: Message, state: FSMContext):
     await message.edit_text(
         messages.ASK_FUELING_COST,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
@@ -45,18 +37,13 @@ async def new_fueling_handler(query: CallbackQuery, state: FSMContext):
             ]
         ])
     )
+    await state.clear()
     await state.update_data(init_message_id=message.message_id)
     await state.set_state(NewFueling.cost)
 
 
 @router.callback_query(FuelingCostCallback.filter(), NewFueling.cost)
-async def fueling_cost_handler(query: CallbackQuery, state: FSMContext, callback_data: FuelingCostCallback):
-    await query.answer()
-
-    message = query.message
-    if not message:
-        return
-
+async def fueling_cost_handler(query: CallbackQuery, message: Message, state: FSMContext, callback_data: FuelingCostCallback):
     init_message_id = await get_init_message_id(state)
     if not init_message_id:
         return

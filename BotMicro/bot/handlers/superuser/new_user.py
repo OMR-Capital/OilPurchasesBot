@@ -13,22 +13,16 @@ router = Router()
 
 
 @router.callback_query(NewAdminCallback.filter())
-async def new_admin_handler(query: CallbackQuery, state: FSMContext):
-    await new_user_handler(query, state, 'admin')
+async def new_admin_handler(query: CallbackQuery, message: Message, state: FSMContext):
+    await new_user_handler(query, message, state, 'admin')
 
 
 @router.callback_query(NewEmployeeCallback.filter())
-async def new_employee_handler(query: CallbackQuery, state: FSMContext):
-    await new_user_handler(query, state, 'employee')
+async def new_employee_handler(query: CallbackQuery, message: Message, state: FSMContext):
+    await new_user_handler(query, message, state, 'employee')
 
 
-async def new_user_handler(query: CallbackQuery, state: FSMContext, mode: str):
-    await query.answer()
-
-    message = query.message
-    if not message:
-        return
-
+async def new_user_handler(query: CallbackQuery, message: Message, state: FSMContext, mode: str):
     await message.edit_text(
         messages.ASK_NAME,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[

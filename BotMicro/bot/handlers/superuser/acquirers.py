@@ -1,12 +1,13 @@
-from aiogram import F, Bot, Router
+from aiogram import Bot, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import (CallbackQuery, InlineKeyboardButton,
                            InlineKeyboardMarkup, Message)
 
 from bot import messages
-from bot.callbacks.superuser import (
-    AcquirersCallback, AcquirersListCallback, ConfirmDeleteAcquirerCallback, DeleteAcquirerCallback, MainPageCallback,
-    NewAcquirerCallback)
+from bot.callbacks.superuser import (AcquirersCallback, AcquirersListCallback,
+                                     ConfirmDeleteAcquirerCallback,
+                                     DeleteAcquirerCallback, MainPageCallback,
+                                     NewAcquirerCallback)
 from bot.states.superuser import NewAcquirerState
 from models.acquirer import Acquirer
 
@@ -14,13 +15,7 @@ router = Router()
 
 
 @router.callback_query(AcquirersCallback.filter())
-async def acquirers_handlers(query: CallbackQuery, callback_data: AcquirersCallback, state: FSMContext):
-    await query.answer()
-
-    message = query.message
-    if not message:
-        return
-
+async def acquirers_handlers(query: CallbackQuery, message: Message, callback_data: AcquirersCallback, state: FSMContext):
     await message.edit_text(
         messages.ACCOUNTS,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
@@ -38,13 +33,7 @@ async def acquirers_handlers(query: CallbackQuery, callback_data: AcquirersCallb
 
 
 @router.callback_query(NewAcquirerCallback.filter())
-async def new_acquirer_handlers(query: CallbackQuery, callback_data: NewAcquirerCallback, state: FSMContext):
-    await query.answer()
-
-    message = query.message
-    if not message:
-        return
-
+async def new_acquirer_handlers(query: CallbackQuery, message: Message, callback_data: NewAcquirerCallback, state: FSMContext):
     await message.edit_text(
         messages.ASK_ACQUIRER_NAME,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
@@ -80,13 +69,7 @@ async def acquirer_name_handler(message: Message, bot: Bot, state: FSMContext):
 
 
 @router.callback_query(AcquirersListCallback.filter())
-async def acquirers_list_handlers(query: CallbackQuery, callback_data: AcquirersListCallback, state: FSMContext):
-    await query.answer()
-
-    message = query.message
-    if not message:
-        return
-
+async def acquirers_list_handlers(query: CallbackQuery, message: Message, callback_data: AcquirersListCallback, state: FSMContext):
     acquirers = Acquirer.query(Acquirer.deleted == False)  # type: ignore
 
     await message.edit_text(
@@ -94,7 +77,7 @@ async def acquirers_list_handlers(query: CallbackQuery, callback_data: Acquirers
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text= f'{acquirer.name}  ❌',
+                    text=f'{acquirer.name}  ❌',
                     callback_data=DeleteAcquirerCallback(acquirer_key=acquirer.key).pack()
                 ),
             ]
@@ -108,13 +91,7 @@ async def acquirers_list_handlers(query: CallbackQuery, callback_data: Acquirers
 
 
 @router.callback_query(DeleteAcquirerCallback.filter())
-async def delete_acquirer_handlers(query: CallbackQuery, callback_data: DeleteAcquirerCallback, state: FSMContext):
-    await query.answer()
-
-    message = query.message
-    if not message:
-        return
-
+async def delete_acquirer_handlers(query: CallbackQuery, message: Message, callback_data: DeleteAcquirerCallback, state: FSMContext):
     acquirer = Acquirer.get_or_none(callback_data.acquirer_key)
     if not acquirer:
         return
@@ -137,13 +114,7 @@ async def delete_acquirer_handlers(query: CallbackQuery, callback_data: DeleteAc
 
 
 @router.callback_query(ConfirmDeleteAcquirerCallback.filter())
-async def confirm_delete_acquirer_handlers(query: CallbackQuery, callback_data: ConfirmDeleteAcquirerCallback, state: FSMContext):
-    await query.answer()
-
-    message = query.message
-    if not message:
-        return
-
+async def confirm_delete_acquirer_handlers(query: CallbackQuery, message: Message, callback_data: ConfirmDeleteAcquirerCallback, state: FSMContext):
     acquirer = Acquirer.get_or_none(callback_data.acquirer_key)
     if not acquirer:
         return

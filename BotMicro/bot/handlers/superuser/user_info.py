@@ -1,31 +1,26 @@
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import (CallbackQuery, InlineKeyboardButton,
-                           InlineKeyboardMarkup)
+                           InlineKeyboardMarkup, Message)
+from odetam.exceptions import ItemNotFound
 
 from bot import messages
 from bot.callbacks.superuser import (AccountsListCallback, RemoveUserCallback,
                                      UserInfoCallback)
 from models import User
-from odetam.exceptions import ItemNotFound
 
 router = Router()
 
 
 @router.callback_query(UserInfoCallback.filter())
-async def accounts_list_handler(query: CallbackQuery, callback_data: UserInfoCallback, state: FSMContext):
-    await query.answer()
+async def accounts_list_handler(query: CallbackQuery, message: Message, callback_data: UserInfoCallback, state: FSMContext):
     await state.clear()
-    
-    message = query.message
-    if not message:
-        return
 
     try:
-        user = User.get(callback_data.key) # type: ignore
+        user = User.get(callback_data.key)  # type: ignore
     except ItemNotFound:
         return
-    
+
     await message.edit_text(
         text=messages.USER_INFO.format(
             name=user.name,
@@ -36,7 +31,7 @@ async def accounts_list_handler(query: CallbackQuery, callback_data: UserInfoCal
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text='❌ Удалить ❌', 
+                    text='❌ Удалить ❌',
                     callback_data=RemoveUserCallback(key=callback_data.key).pack()
                 )
             ],
@@ -46,13 +41,8 @@ async def accounts_list_handler(query: CallbackQuery, callback_data: UserInfoCal
 
 
 @router.callback_query(RemoveUserCallback.filter())
-async def remove_user_handler(query: CallbackQuery, callback_data: RemoveUserCallback):
-    await query.answer()
-    message = query.message
-    if not message:
-        return
-
-    User.delete_key(callback_data.key) # type: ignore
+async def remove_user_handler(query: CallbackQuery, message: Message, callback_data: RemoveUserCallback):
+    User.delete_key(callback_data.key)  # type: ignore
 
     await message.edit_text(
         text=messages.SUCCESSFUL_DELETE_USER,
