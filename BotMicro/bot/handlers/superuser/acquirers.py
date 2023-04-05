@@ -155,7 +155,7 @@ async def confirm_delete_acquirer_handlers(query: CallbackQuery, callback_data: 
         messages.SUCCESSFUL_DELETE_ACQUIRER,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [
-                InlineKeyboardButton(text='Назад', callback_data=AcquirersCallback().pack()),
+                InlineKeyboardButton(text='Назад', callback_data=AcquirersListCallback().pack()),
             ],
         ])
     )
