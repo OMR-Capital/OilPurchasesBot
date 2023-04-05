@@ -15,7 +15,7 @@ from utils.datetime import MSC_TZ
 async def new_dispatch(message: Message, bot: Bot, state: FSMContext) -> Optional[Dispatch]:
     data = await state.get_data()
 
-    result = User.query((User.chat_id == message.chat.id) & (User.mode == 'employee'))
+    result = User.query(User.chat_id == message.chat.id)
     if not result:
         return None
 
@@ -24,13 +24,13 @@ async def new_dispatch(message: Message, bot: Bot, state: FSMContext) -> Optiona
     dispatch = Dispatch(
         creator=creator.name,
         create_time=datetime.now(),
-        destination=data['destination'],
+        acquirer=data['acquirer_key'],
         amount=amount,
         area=creator.area
     )
     dispatch.save()
 
-    await spread_dispatch(dispatch, creator, bot)
+    await spread_dispatch(dispatch, creator, data['acquirer_name'], bot)
     return dispatch
 
 
@@ -47,7 +47,7 @@ async def spread_dispatch(dispatch: Dispatch, creator: User, bot: Bot):
                     time=create_time.isoformat(sep=' ', timespec='minutes'),
                     area=dispatch.area,
                     amount=dispatch.amount,
-                    destination=dispatch.destination,
+                    acquirer=acquirer_name,
                 ),
                 reply_markup=InlineKeyboardMarkup(inline_keyboard=[
                     [

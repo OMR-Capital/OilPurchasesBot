@@ -4,20 +4,16 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
                            InlineKeyboardMarkup, Message)
 
 from bot import messages
-from bot.callbacks.employee import (ConfirmDispatchCallback, MainPageCallback,
-                                    DestinationCallback, NewDispatchCallback, UnitCallback)
+from bot.callbacks.employee import (AcquirerCallback, ConfirmDispatchCallback,
+                                    MainPageCallback, NewDispatchCallback,
+                                    UnitCallback)
 from bot.handlers.utils.chat import error
 from bot.handlers.utils.dispatches import new_dispatch
 from bot.handlers.utils.message_edit import get_init_message_id
 from bot.states.employee import NewDispatchState
+from models.acquirer import Acquirer
 
 router = Router()
-
-
-cancel_kb = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(
-        text='Отмена', callback_data=MainPageCallback().pack())]
-])
 
 
 @router.callback_query(NewDispatchCallback.filter())
@@ -28,27 +24,36 @@ async def new_dispatch_handler(query: CallbackQuery,  callback_data: NewDispatch
     if not message:
         return
 
+    acquirers = Acquirer.query(Acquirer.deleted == False)
+
     await message.edit_text(
-        messages.ASK_DESTINATION,
+        messages.ASK_ACQUIRER,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='Склад Саратов', callback_data=DestinationCallback(destination='Склад Саратов').pack())],
-            [InlineKeyboardButton(text='ООО "СПС"', callback_data=DestinationCallback(destination='ООО "СПС"').pack())],
-            [InlineKeyboardButton(text='ООО "НПО "ХимБурНефть"', callback_data=DestinationCallback(destination='ООО "НПО "ХимБурНефть"').pack())],
-            [InlineKeyboardButton(text='ООО "СпецАвтомат"', callback_data=DestinationCallback(destination='ООО "СпецАвтомат"').pack())],
-        ] + cancel_kb.inline_keyboard)
+            [
+                InlineKeyboardButton(text=acquirer.name, callback_data=AcquirerCallback(acquirer_key=acquirer.key).pack())
+            ] for acquirer in acquirers if acquirer.key
+        ] + [
+            [
+                InlineKeyboardButton(text='Отмена', callback_data=MainPageCallback().pack())
+            ]
+        ])
     )
     await state.update_data(init_message_id=message.message_id)
-    await state.set_state(NewDispatchState.destination)
+    await state.set_state(NewDispatchState.acquirer)
 
 
-@router.callback_query(NewDispatchState.destination, DestinationCallback.filter())
-async def destination_handler(query: CallbackQuery, callback_data: DestinationCallback, state: FSMContext):
+@router.callback_query(NewDispatchState.acquirer, AcquirerCallback.filter())
+async def acquirer_handler(query: CallbackQuery, callback_data: AcquirerCallback, state: FSMContext):
     await query.answer()
 
     message = query.message
     if not message:
         return
 
+    acquirer = Acquirer.get_or_none(callback_data.acquirer_key)
+    if not acquirer:
+        return
+    
     await message.edit_text(
         text=messages.ASK_UNIT,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
@@ -56,9 +61,13 @@ async def destination_handler(query: CallbackQuery, callback_data: DestinationCa
                 InlineKeyboardButton(text='Литры', callback_data=UnitCallback(unit='liter').pack()),
                 InlineKeyboardButton(text='Килограммы', callback_data=UnitCallback(unit='kg').pack())
             ],
-        ] + cancel_kb.inline_keyboard)
+        ] + [
+            [
+                InlineKeyboardButton(text='Отмена', callback_data=MainPageCallback().pack())
+            ]
+        ])
     )
-    await state.update_data(destination=callback_data.destination)
+    await state.update_data(acquirer_key=acquirer.key, acquirer_name=acquirer.name)
     await state.set_state(NewDispatchState.unit)
 
 
@@ -72,7 +81,11 @@ async def unit_handler(query: CallbackQuery, callback_data: UnitCallback, state:
 
     await message.edit_text(
         messages.ask_amount(callback_data.unit),
-        reply_markup=cancel_kb
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [
+                InlineKeyboardButton(text='Назад', callback_data=MainPageCallback().pack())
+            ]
+        ])
     )
     await state.update_data(unit=callback_data.unit)
     await state.set_state(NewDispatchState.amount)
@@ -96,13 +109,17 @@ async def amount_handler(message: Message, bot: Bot, state: FSMContext):
         message_id=init_message_id,
         text=messages.DISPATCH_BASE.format(
             amount=amount,
-            destination=data['destination']
+            acquirer=data['acquirer_name']
         ),
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [
                 InlineKeyboardButton(text='Подтвердить', callback_data=ConfirmDispatchCallback().pack())
             ]
-        ] + cancel_kb.inline_keyboard)
+        ] + [
+            [
+                InlineKeyboardButton(text='Отмена', callback_data=MainPageCallback().pack())
+            ]
+        ])
     )
     await state.update_data(amount=amount)
     await state.set_state(NewDispatchState.confirm)
@@ -120,7 +137,11 @@ async def wrong_amount_handler(message: Message, bot: Bot, state: FSMContext):
         chat_id=message.chat.id,
         message_id=init_message_id,
         text=messages.WRONG_INTEGER,
-        reply_markup=cancel_kb
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [
+                InlineKeyboardButton(text='Назад', callback_data=MainPageCallback().pack())
+            ]
+        ])
     )
 
 
@@ -141,6 +162,8 @@ async def create_new_dispatch(message: Message, bot: Bot, state: FSMContext):
     if not init_message_id:
         return
 
+    data = await state.get_data() 
+
     dispatch = await new_dispatch(message, bot, state)
     if dispatch is None:
         await error(message.chat.id, init_message_id, MainPageCallback().pack())
@@ -151,7 +174,7 @@ async def create_new_dispatch(message: Message, bot: Bot, state: FSMContext):
         message_id=init_message_id,
         text=messages.SUCCESSFUL_CREATE_DISPATCH.format(
             amount=dispatch.amount,
-            destination=dispatch.destination,
+            acquirer=data['acquirer_name'],
         ),
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [

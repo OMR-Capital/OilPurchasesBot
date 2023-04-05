@@ -1,4 +1,4 @@
-from aiogram.fsm.state import StatesGroup, State
+from aiogram.fsm.state import State, StatesGroup
 
 
 class NewPurchaseState(StatesGroup):
@@ -14,7 +14,7 @@ class NewPurchaseState(StatesGroup):
 
 
 class NewDispatchState(StatesGroup):
-    destination = State()
+    acquirer = State()
     unit = State()
     amount = State()
     confirm = State()

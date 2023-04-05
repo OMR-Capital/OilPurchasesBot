@@ -1,4 +1,5 @@
 from typing import Literal
+
 from aiogram.filters.callback_data import CallbackData
 
 
@@ -38,8 +39,8 @@ class NewDispatchCallback(CallbackData, prefix='new_dis'):
     pass
 
 
-class DestinationCallback(CallbackData, prefix='dis.dest'):
-    destination: str
+class AcquirerCallback(CallbackData, prefix='dis.acquirer'):
+    acquirer_key: str
     
 
 class ConfirmDispatchCallback(CallbackData, prefix='dis.conf'):
