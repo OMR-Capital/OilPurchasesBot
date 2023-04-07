@@ -1,4 +1,4 @@
-from aiogram import F, Router
+from aiogram import F, Bot, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import (CallbackQuery, InlineKeyboardButton,
                            InlineKeyboardMarkup, Message)
@@ -8,9 +8,9 @@ from bot.callbacks.employee import (ClientTypeCallback, ContractTypeCallback,
                                     MainPageCallback, NewPurchaseCallback,
                                     UnitCallback)
 from bot.handlers.utils import edit_message, get_init_message_id
-from bot.handlers.utils.chat import error
 from bot.handlers.utils.purchases import new_purchase
 from bot.states.employee import NewPurchaseState
+from utils.statistic.purchases import add_purchase_stats
 
 router = Router()
 
@@ -138,12 +138,12 @@ async def wrong_amount_handler(message: Message, state: FSMContext):
 
 
 @router.message(NewPurchaseState.inn, F.text)
-async def inn_handler(message: Message, state: FSMContext):
+async def inn_handler(message: Message, bot: Bot, state: FSMContext):
     await message.delete()
 
     inn = message.text or ''
     await state.update_data(inn=inn, price=0, card='', bank='')
-    await create_new_purchase(message, state)
+    await create_new_purchase(message, bot, state)
 
 
 @router.message(NewPurchaseState.price, F.text.regexp(r'^\d+\.?\d*$'))
@@ -189,40 +189,41 @@ async def card_handler(message: Message, state: FSMContext):
 
 
 @router.message(NewPurchaseState.bank, F.text)
-async def bank_handler(message: Message, state: FSMContext):
+async def bank_handler(message: Message, bot: Bot, state: FSMContext):
     await message.delete()
 
     bank = message.text or ''
     await state.update_data(bank=bank)
-    await create_new_purchase(message, state)
+    await create_new_purchase(message, bot, state)
 
 
-async def create_new_purchase(message: Message, state: FSMContext):
+async def create_new_purchase(message: Message, bot: Bot, state: FSMContext):
     init_message_id = await get_init_message_id(state)
     if not init_message_id:
         return
 
     purchase = await new_purchase(message, state)
     if purchase is None:
-        await error(message.chat.id, init_message_id, MainPageCallback().pack())
+        await message.answer(messages.ERROR)
         return
 
-    await edit_message(
-        message.chat.id,
-        init_message_id,
-        messages.SUCCESSFUL_CREATE_PURCHASE.format(
-            inn=purchase.inn,
-            client_type=purchase.client_type,
+    await bot.edit_message_text(
+        chat_id=message.chat.id,
+        message_id=init_message_id,
+        text=messages.SUCCESSFUL_CREATE_PURCHASE.format(
             contract_type=purchase.contract_type,
+            client_type=purchase.client_type,
             supplier=purchase.supplier,
             amount=purchase.amount,
             price=purchase.price,
+            inn=purchase.inn,
             card=purchase.card,
-            bank=purchase.bank
+            bank=purchase.bank,
         ),
-        InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(
-                text='Назад', callback_data=MainPageCallback().pack())]
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text='Назад', callback_data=MainPageCallback().pack())]
         ])
     )
     await state.clear()
+
+    await add_purchase_stats(purchase)
