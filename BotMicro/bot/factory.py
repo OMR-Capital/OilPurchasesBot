@@ -19,7 +19,7 @@ def create_dispatcher(deta: Deta) -> Dispatcher:
     
     dispatcher.callback_query.middleware(CallbackAnswerMiddleware())
     dispatcher.callback_query.middleware(CallbackMessageMiddleware())
-    dispatcher.callback_query.middleware(LoggingMiddleware())
+    dispatcher.callback_query.middleware(LoggingMiddleware(60 * 60 * 2))
     dispatcher.message.middleware(LoggingMiddleware())
 
     return dispatcher
