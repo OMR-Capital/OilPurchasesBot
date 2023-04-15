@@ -34,7 +34,7 @@ async def new_dispatch(message: Message, bot: Bot, state: FSMContext) -> Optiona
     return dispatch
 
 
-async def spread_dispatch(dispatch: Dispatch, creator: User, bot: Bot):
+async def spread_dispatch(dispatch: Dispatch, creator: User, acquirer_name: str, bot: Bot):
     admins = User.query((User.mode == 'admin') | (User.mode == 'superuser'))  # type: ignore
     for admin in admins:
         try:
