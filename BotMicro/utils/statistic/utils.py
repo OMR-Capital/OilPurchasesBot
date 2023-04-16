@@ -2,7 +2,14 @@ from typing import Any
 
 
 def escape_dict_strings(data: dict[str, Any]) -> dict[str, Any]:
-    return {key: escape_string(value) for key, value in data.items() if isinstance(value, str)}
+    new_data = {}
+    for key in data:
+        if isinstance(data[key], str):
+            new_data[key] = escape_string(data[key])
+        else:
+            new_data[key] = data[key]
+            
+    return data
     
 
 def escape_string(string: str) -> str:

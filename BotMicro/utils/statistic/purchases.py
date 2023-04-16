@@ -1,4 +1,3 @@
-import json
 from typing import Any, Optional
 
 from pydantic import BaseModel
@@ -75,7 +74,7 @@ async def add_purchase_stats(purchase: Purchase) -> Optional[dict[str, Any]]:
         method='POST',
         micro='statistic',
         route='/purchase',
-        data=json.dumps(data)
+        data=data
     )
 
     return result
