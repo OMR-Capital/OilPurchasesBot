@@ -3,6 +3,8 @@ from typing import Any, Optional
 
 from aiohttp.client import ClientSession
 
+from utils.micro_api.utils import escape_dict_strings
+
 HEADERS = {
     "Content-Type": "application/json",
     "Accept": "application/json",
@@ -17,6 +19,9 @@ def get_micro_route_url(micro_path: str, route: str) -> str:
 
 
 async def request_micro(method: str, micro: str, route: str, data: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+    if data is not None:
+        data = escape_dict_strings(data)
+
     if route[0] != '/':
         raise ValueError('Route must start with /')
 

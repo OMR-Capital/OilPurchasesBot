@@ -5,7 +5,6 @@ from pydantic import BaseModel
 from models.purchase import Purchase
 from models.user import User
 from utils.micro_api.requests import request_micro
-from utils.statistic.utils import escape_dict_strings
 
 
 class PurchaseData(BaseModel):
@@ -62,18 +61,33 @@ async def get_statistic_data(purchase: Purchase) -> Optional[dict[str, dict[str,
     )
 
     data = {'purchase': purchase_stat.dict()}
-    return escape_dict_strings(data)
+    return data
 
 
 async def add_purchase_stats(purchase: Purchase) -> Optional[dict[str, Any]]:
     data = await get_statistic_data(purchase)
     if data is None:
-        return None
+        raise Exception('Purchase data is None')
 
     result = await request_micro(
         method='POST',
         micro='statistic',
         route='/purchase',
+        data=data
+    )
+
+    return result
+
+
+async def update_purchase_stats(purchase: Purchase) -> Optional[dict[str, Any]]:
+    data = await get_statistic_data(purchase)
+    if data is None:
+        raise Exception('Purchase data is None')
+
+    result = await request_micro(
+        method='PATCH',
+        micro='statistic',
+        route=f'/purchase/{purchase.key}',
         data=data
     )
 
