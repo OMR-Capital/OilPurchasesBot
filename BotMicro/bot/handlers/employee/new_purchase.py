@@ -100,7 +100,7 @@ async def unit_handler(query: CallbackQuery, message: Message, callback_data: Un
 
 
 @router.message(NewPurchaseState.amount, F.text.regexp(r'^\d+\.?\d*$'))
-async def amount_handler(message: Message, state: FSMContext):
+async def amount_handler(message: Message, bot: Bot, state: FSMContext):
     await message.delete()
 
     init_message_id = await get_init_message_id(state)
@@ -112,11 +112,10 @@ async def amount_handler(message: Message, state: FSMContext):
 
     data = await state.get_data()
     if data.get('cashless'):
-        await edit_message(message.chat.id, init_message_id, messages.ASK_INN, cancel_kb)
-        await state.set_state(NewPurchaseState.inn)
+        await state.update_data(price=0, card='', bank='')
+        await create_new_purchase(message, bot, state)
         return
 
-    await state.update_data(inn='')
     await edit_message(
         message.chat.id,
         init_message_id,
@@ -135,15 +134,6 @@ async def wrong_amount_handler(message: Message, state: FSMContext):
         return
 
     await edit_message(message.chat.id, init_message_id, messages.WRONG_INTEGER, cancel_kb)
-
-
-@router.message(NewPurchaseState.inn, F.text)
-async def inn_handler(message: Message, bot: Bot, state: FSMContext):
-    await message.delete()
-
-    inn = message.text or ''
-    await state.update_data(inn=inn, price=0, card='', bank='')
-    await create_new_purchase(message, bot, state)
 
 
 @router.message(NewPurchaseState.price, F.text.regexp(r'^\d+\.?\d*$'))
@@ -216,7 +206,6 @@ async def create_new_purchase(message: Message, bot: Bot, state: FSMContext):
             supplier=purchase.supplier,
             amount=purchase.amount,
             price=purchase.price,
-            inn=purchase.inn,
             card=purchase.card,
             bank=purchase.bank,
         ),

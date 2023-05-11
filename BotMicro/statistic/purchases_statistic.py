@@ -19,7 +19,6 @@ TABLE_HEAD = [
     'Поставщик',
     'Объем (в литрах)',
     'Цена (за литр)',
-    'ИНН',
     'Счет оплаты',
     'Регион',
     'Время одобрения',
@@ -69,9 +68,6 @@ def get_purchase_statistic_row(purchase: Purchase) -> list[Any]:
     else:
         approve_time = ''
 
-    if purchase.inn:
-        purchase.inn = "'" + purchase.inn
-
     if purchase.card:
         purchase.card = "'" + purchase.card
 
@@ -84,7 +80,6 @@ def get_purchase_statistic_row(purchase: Purchase) -> list[Any]:
         purchase.supplier,
         purchase.amount,
         purchase.price,
-        purchase.inn,
         purchase.card,
         purchase.area or '',
         approve_time,

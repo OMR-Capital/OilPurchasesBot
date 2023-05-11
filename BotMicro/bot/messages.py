@@ -60,15 +60,13 @@ ASK_BANK = 'Укажите наименование банка оплаты:'
 WRONG_INTEGER = 'Значение должно быть числом.\nПопробуйте снова:'
 
 
-PURCHASE_BASE = ''' 
+PURCHASE_BASE = '''
 <b>Тип договора</b>: {contract_type}
 <b>Клиент</b>: {client_type}
 <b>Поставщик</b>: {supplier}
 <b>Объем (литров)</b>: {amount:.3f}
 <b>Цена (за литр)</b>: {price:.3f}
-<b>ИНН</b>: 
-<code>{inn}</code>
-<b>Реквизиты для оплаты</b>: 
+<b>Реквизиты для оплаты</b>:
 <code>{card}</code>
 <b>Банк</b>: {bank}
 '''

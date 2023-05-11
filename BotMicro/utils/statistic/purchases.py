@@ -15,7 +15,6 @@ class PurchaseData(BaseModel):
     contract_type: str
     client_type: str
     supplier: str
-    inn: str
     amount: float
     price: float
     card: str
@@ -48,7 +47,6 @@ async def get_statistic_data(purchase: Purchase) -> Optional[dict[str, dict[str,
         contract_type=purchase.contract_type,
         client_type=purchase.client_type,
         supplier=purchase.supplier,
-        inn=purchase.inn,
         amount=purchase.amount,
         price=purchase.price,
         card=purchase.card,
