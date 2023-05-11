@@ -24,7 +24,7 @@ async def add_purchase(
     purchase_row = build_purchase_row(request.purchase)
     try:
         add_row(worksheet, purchase_row)
-        sort_by_column(worksheet, CREATE_TIME_COLUMN)
+        sort_by_column(worksheet, CREATE_TIME_COLUMN, reverse=True)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -51,7 +51,7 @@ async def update_purchase(
     purchase_row = build_purchase_row(request.purchase)
     try:
         update_row_by_key(worksheet, purchase_key, purchase_row)
-        sort_by_column(worksheet, CREATE_TIME_COLUMN)
+        sort_by_column(worksheet, CREATE_TIME_COLUMN, reverse=True)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
