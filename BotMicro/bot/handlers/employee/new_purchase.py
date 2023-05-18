@@ -111,11 +111,6 @@ async def amount_handler(message: Message, bot: Bot, state: FSMContext):
     await state.update_data(amount=amount)
 
     data = await state.get_data()
-    if data.get('cashless'):
-        await state.update_data(price=0, card='', bank='')
-        await create_new_purchase(message, bot, state)
-        return
-
     await edit_message(
         message.chat.id,
         init_message_id,
@@ -137,10 +132,11 @@ async def wrong_amount_handler(message: Message, state: FSMContext):
 
 
 @router.message(NewPurchaseState.price, F.text.regexp(r'^\d+\.?\d*$'))
-async def price_handler(message: Message, state: FSMContext):
+async def price_handler(message: Message, bot: Bot, state: FSMContext):
     await message.delete()
 
     price = message.text or ''
+    await state.update_data(price=price)
 
     init_message_id = await get_init_message_id(state)
     if not init_message_id:
@@ -148,7 +144,12 @@ async def price_handler(message: Message, state: FSMContext):
 
     await edit_message(message.chat.id, init_message_id, messages.ASK_CARD, cancel_kb)
 
-    await state.update_data(price=price)
+    data = await state.get_data()
+    if data.get('cashless'):
+        await state.update_data(card='', bank='')
+        await create_new_purchase(message, bot, state)
+        return
+
     await state.set_state(NewPurchaseState.card)
 
 
