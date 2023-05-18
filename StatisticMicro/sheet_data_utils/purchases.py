@@ -31,7 +31,7 @@ def build_purchase_row(purchase: PurchaseStats) -> list[str]:
         purchase.supplier,
         f'{purchase.amount:.3f}',
         f'{purchase.price:.3f}',
-        purchase.inn,
+        purchase.inn or '',
         purchase.card,
         purchase.area,
         datetime_to_str(purchase.approve_time) if purchase.approve_time else '',
