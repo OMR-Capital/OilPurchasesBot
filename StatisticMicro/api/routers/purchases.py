@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from gspread.worksheet import Worksheet
 
 from api.schemas.base import BaseResponse, FailureResponse, SuccessResponse
-from api.schemas.purchases import PurchaseRequest
+from api.schemas.purchases import PurchaseRequest, PurchaseResponse, PurchasesResponse
 from api.stubs import PurchasesWorksheetStub
 from google_sheets_utils.worksheet import (add_row, remove_row_by_key,
                                            sort_by_column, update_row_by_key)
@@ -10,6 +10,26 @@ from models.purchase import PurchaseStats
 from sheet_data_utils.purchases import CREATE_TIME_COLUMN, build_purchase_row
 
 purchases_router = APIRouter(prefix='/purchase', tags=['Purchases'])
+
+
+@purchases_router.get('/')
+async def get_purchases() -> PurchasesResponse:
+    purchases = await PurchaseStats.get_all()
+    return PurchasesResponse(ok=True, purchases=purchases)
+
+
+@purchases_router.get('/{purchase_key}')
+async def get_purchase(
+    purchase_key: str,
+) -> PurchaseResponse:
+    purchase = await PurchaseStats.get_or_none(purchase_key)
+    if not purchase:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'Purchase {purchase_key} not found.'
+        )
+
+    return PurchaseResponse(ok=True, purchase=purchase)
 
 
 @purchases_router.post('/')
