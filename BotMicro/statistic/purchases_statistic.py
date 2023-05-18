@@ -23,6 +23,7 @@ TABLE_HEAD = [
     'Регион',
     'Время одобрения',
     'Одобривший заявку',
+    'Ключ'
 ]
 TITLE_FORMAT = {
     'textFormat': {'bold': True, 'fontSize': 10},
@@ -84,6 +85,7 @@ def get_purchase_statistic_row(purchase: Purchase) -> list[Any]:
         purchase.area or '',
         approve_time,
         approver_name,
+        purchase.key
     ]
 
 
