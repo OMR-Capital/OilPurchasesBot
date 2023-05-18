@@ -1,5 +1,5 @@
 from models.purchase import PurchaseStats
-from utils.datetime import datetime_to_str
+from utils.datetime import datetime_to_str, get_month_name, get_weekday_name
 
 
 CREATE_TIME_COLUMN = 4 # for sorting in GoogleSheets
@@ -18,6 +18,9 @@ PURCHASES_HEADER = [
     'Регион',
     'Время одобрения',
     'Одобривший заявку',
+    'День',
+    'Неделя',
+    'Месяц',
 ]
 
 
@@ -36,4 +39,7 @@ def build_purchase_row(purchase: PurchaseStats) -> list[str]:
         purchase.area,
         datetime_to_str(purchase.approve_time) if purchase.approve_time else '',
         purchase.approver if purchase.approver else '',
+        str(purchase.create_time.day),
+        get_weekday_name(purchase.create_time.isoweekday()),
+        get_month_name(purchase.create_time.month),
     ]
