@@ -1,6 +1,9 @@
 from datetime import datetime
 from typing import Optional
 from odetam import DetaModel
+from pydantic import validator
+
+from utils.awesome_random import awesome_string
 
 
 class Purchase(DetaModel):
@@ -22,3 +25,6 @@ class Purchase(DetaModel):
     class Config:
         table_name = 'purchases'
 
+    @validator('key', pre=True, always=True)
+    def set_key(cls, key: Optional[str]) -> str:
+        return key or awesome_string(length=6)
