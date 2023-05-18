@@ -32,7 +32,7 @@ def build_purchase_row(purchase: PurchaseStats) -> list[str]:
         f'{purchase.amount:.3f}',
         f'{purchase.price:.3f}',
         purchase.inn or '',
-        purchase.card,
+        "'" + purchase.card,
         purchase.area,
         datetime_to_str(purchase.approve_time) if purchase.approve_time else '',
         purchase.approver if purchase.approver else '',
