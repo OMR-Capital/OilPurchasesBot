@@ -40,6 +40,6 @@ def build_purchase_row(purchase: PurchaseStats) -> list[str]:
         datetime_to_str(purchase.approve_time) if purchase.approve_time else '',
         purchase.approver if purchase.approver else '',
         str(purchase.create_time.day),
-        get_weekday_name(purchase.create_time.isoweekday()),
+        get_weekday_name(purchase.create_time.weekday()),
         get_month_name(purchase.create_time.month),
     ]
