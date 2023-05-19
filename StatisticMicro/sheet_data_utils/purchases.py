@@ -38,7 +38,7 @@ def build_purchase_row(purchase: PurchaseStats) -> list[Any]:
         purchase.inn or '',
         "'" + purchase.card,
         purchase.area,
-        datetime_to_str(purchase.approve_time) or '',
+        datetime_to_str(purchase.approve_time) if purchase.approve_time else '',
         purchase.approver or '',
         str(purchase.create_time.day),
         get_weekday_name(purchase.create_time.weekday()),
