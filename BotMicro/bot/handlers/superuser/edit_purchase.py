@@ -10,6 +10,8 @@ from bot.callbacks.superuser import (EditPurchaseCallback, EditSkipCallback,
                                      MainPageCallback)
 from bot.states.superuser import EditPurchaseState
 from models.purchase import ClientType, ContractType, Purchase, Unit
+from statistic.purchases_statistic import update_purchases_statistic
+from utils.statistic.purchases import update_purchase_stats
 
 router = Router()
 
@@ -427,4 +429,4 @@ async def update_purchase(message: Message, bot: Bot, state: FSMContext):
         ])
     )
     await state.clear()
-    # await update_purchase_stats
+    await update_purchase_stats(purchase)
