@@ -12,6 +12,7 @@ from bot.handlers.utils.dispatches import new_dispatch
 from bot.handlers.utils.message_edit import get_init_message_id
 from bot.states.employee import NewDispatchState
 from models.acquirer import Acquirer
+from models.purchase import Unit
 
 router = Router()
 
@@ -46,8 +47,8 @@ async def acquirer_handler(query: CallbackQuery, message: Message, callback_data
         text=messages.ASK_UNIT,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [
-                InlineKeyboardButton(text='Литры', callback_data=UnitCallback(unit='liter').pack()),
-                InlineKeyboardButton(text='Килограммы', callback_data=UnitCallback(unit='kg').pack())
+                InlineKeyboardButton(text='Литры', callback_data=UnitCallback(unit=Unit.LITERS).pack()),
+                InlineKeyboardButton(text='Килограммы', callback_data=UnitCallback(unit=Unit.KG).pack())
             ],
         ] + [
             [
@@ -83,7 +84,7 @@ async def amount_handler(message: Message, bot: Bot, state: FSMContext):
 
     data = await state.get_data()
     amount = float(message.text or '')
-    if data['unit'] == 'kg':
+    if data['unit'] == Unit.KG:
         amount = amount / 0.88
 
     await bot.edit_message_text(

@@ -9,6 +9,7 @@ from bot.callbacks.superuser import MainPageCallback as superuser_menu_callback
 from bot.messages import amount_statistics
 from models.dispatch import Dispatch
 from models.purchase import Purchase
+from models.user import UserMode
 
 router = Router()
 
@@ -47,7 +48,7 @@ async def amount_statistic_handler(query: CallbackQuery, message: Message, callb
     total_dispatched_amount = sum(dispatch.amount for dispatch in dispatches) * 0.88
     areas_amount = get_areas_amount(areas, area_to_purchases, area_to_dispatches)
 
-    menu_callback = superuser_menu_callback if callback_data.user_mode == 'superuser' else admin_menu_callback
+    menu_callback = superuser_menu_callback if callback_data.user_mode == UserMode.SUPERUSER else admin_menu_callback
     await message.edit_text(
         text=amount_statistics(
             total_purchased_amount,

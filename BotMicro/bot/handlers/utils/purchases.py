@@ -9,8 +9,10 @@ from bot import messages
 from bot.callbacks.admin import ApprovePurchaseCallback
 from bot.callbacks.employee import HidePurchaseCallback
 from models import Purchase, User
+from models.purchase import Unit
 from models.spread import Spread
 from odetam.exceptions import ItemNotFound
+from models.user import UserMode
 
 from utils.datetime import MSC_TZ
 
@@ -27,12 +29,12 @@ async def new_purchase(message: Message, state: FSMContext) -> Optional[Purchase
     unit = data.get('unit')
     amount = float(data.get('amount', 0))
     price = float(data.get('price', 0))
-    if unit == 'kg':
+    if unit == Unit.KG:
         price, amount = price / 0.88, amount / 0.88
 
     purchase = Purchase(
-        client_type='Менеджерский' if data.get('from_manager') else 'Собственный',
-        contract_type='Безнал' if data.get('cashless') else 'Нал',
+        client_type=data.get('client_type'),
+        contract_type=data.get('contract_type'),
         supplier=data.get('supplier'),
         amount=amount,
         price=price,
@@ -55,7 +57,7 @@ async def spread_purchase(purchase: Purchase, creator: User):
         return
 
     spread = Spread(key=purchase.key, messages=[])
-    admins = User.query((User.mode == 'admin') | (User.mode == 'superuser'))  # type: ignore
+    admins = User.query((User.mode == UserMode.ADMIN) | (User.mode == UserMode.SUPERUSER))  # type: ignore
     for admin in admins:
         try:
             create_time = purchase.create_time.astimezone(MSC_TZ)

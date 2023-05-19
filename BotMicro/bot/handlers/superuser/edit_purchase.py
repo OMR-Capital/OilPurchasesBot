@@ -9,7 +9,7 @@ from bot.callbacks.employee import (ClientTypeCallback, ContractTypeCallback,
 from bot.callbacks.superuser import (EditPurchaseCallback, EditSkipCallback,
                                      MainPageCallback)
 from bot.states.superuser import EditPurchaseState
-from models.purchase import Purchase
+from models.purchase import ClientType, ContractType, Purchase, Unit
 
 router = Router()
 
@@ -80,11 +80,11 @@ async def ask_contract_type(message: Message, bot: Bot, state: FSMContext):
             [
                 InlineKeyboardButton(
                     text='Безнал',
-                    callback_data=ContractTypeCallback(cashless=True).pack()
+                    callback_data=ContractTypeCallback(contract_type=ContractType.CASHLESS).pack()
                 ),
                 InlineKeyboardButton(
                     text='Нал',
-                    callback_data=ContractTypeCallback(cashless=False).pack()
+                    callback_data=ContractTypeCallback(contract_type=ContractType.CASH).pack()
                 )
             ],
             [
@@ -110,7 +110,7 @@ async def skip_contract_type_handler(query: CallbackQuery, message: Message, sta
 @router.callback_query(EditPurchaseState.contract_type, ContractTypeCallback.filter())
 async def contract_type_handler(query: CallbackQuery, message: Message, callback_data: ContractTypeCallback, state: FSMContext):
     purchase = await get_purchase(state)
-    purchase.contract_type = 'Безнал' if callback_data.cashless else 'Нал'
+    purchase.contract_type = callback_data.contract_type
     await set_purchase(state, purchase)
 
     await ask_client_type(message, state)
@@ -124,11 +124,11 @@ async def ask_client_type(message: Message, state: FSMContext):
             [
                 InlineKeyboardButton(
                     text='Менеджерский',
-                    callback_data=ClientTypeCallback(from_manager=True).pack()
+                    callback_data=ClientTypeCallback(client_type=ClientType.MANAGER).pack()
                 ),
                 InlineKeyboardButton(
                     text='Собственный',
-                    callback_data=ClientTypeCallback(from_manager=False).pack()
+                    callback_data=ClientTypeCallback(client_type=ClientType.OWN).pack()
                 )
             ],
             [
@@ -154,7 +154,7 @@ async def skip_client_type_handler(query: CallbackQuery, message: Message, state
 @router.callback_query(EditPurchaseState.client_type, ClientTypeCallback.filter())
 async def client_type_handler(query: CallbackQuery, message: Message, callback_data: ClientTypeCallback, state: FSMContext):
     purchase = await get_purchase(state)
-    purchase.client_type = 'Менеджерский' if callback_data.from_manager else 'Собственный'
+    purchase.client_type = callback_data.client_type
     await set_purchase(state, purchase)
 
     await ask_supplier(message, state)
@@ -207,11 +207,11 @@ async def ask_unit(message: Message, bot: Bot, state: FSMContext):
             [
                 InlineKeyboardButton(
                     text='Литры',
-                    callback_data=UnitCallback(unit='liter').pack()
+                    callback_data=UnitCallback(unit=Unit.LITERS).pack()
                 ),
                 InlineKeyboardButton(
                     text='Килограммы',
-                    callback_data=UnitCallback(unit='kg').pack()
+                    callback_data=UnitCallback(unit=Unit.KG).pack()
                 )
             ],
             [

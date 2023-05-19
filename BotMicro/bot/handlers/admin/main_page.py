@@ -8,6 +8,7 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
 from bot import messages
 from bot.callbacks.admin import MainPageCallback
 from bot.callbacks.superuser import AmountStatisticsCallback
+from models.user import UserMode
 
 router = Router()
 
@@ -23,6 +24,6 @@ async def open_main_page(message: Message):
         messages.MAIN_PAGE,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text='Статистика', url=getenv('GOOGLE_SHEET_LINK', ''))],
-            [InlineKeyboardButton(text='Статистика объемов', callback_data=AmountStatisticsCallback(user_mode='admin').pack())],
+            [InlineKeyboardButton(text='Статистика объемов', callback_data=AmountStatisticsCallback(user_mode=UserMode.ADMIN).pack())],
         ])
     )

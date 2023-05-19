@@ -1,6 +1,4 @@
-from typing import Literal
-
-from models.purchase import Purchase
+from models.purchase import Purchase, Unit
 
 START = 'Я помогу Вам управлять закупками!'
 
@@ -51,13 +49,13 @@ ASK_UNIT = 'Выберете единицу измерения:'
 ASK_INN = 'Укажите ИНН клиента:'
 
 
-def ask_amount(unit: Literal['liter', 'kg']) -> str:
-    unit_name = 'литрах' if unit == 'liter' else 'килограммах'
+def ask_amount(unit: Unit) -> str:
+    unit_name = 'литрах' if unit == Unit.LITERS else 'килограммах'
     return f'Укажите объем вывезенного масла в {unit_name}:'
 
 
-def ask_price(unit: Literal['liter', 'kg']) -> str:
-    unit_name = 'литр' if unit == 'liter' else 'килограмм'
+def ask_price(unit: Unit) -> str:
+    unit_name = 'литр' if unit == Unit.LITERS else 'килограмм'
     return f'Укажите цену за {unit_name}:'
 
 

@@ -1,14 +1,32 @@
+from enum import Enum
 from random import choices, choice
 from string import ascii_lowercase, digits
-from typing import Literal, Optional
+from typing import Optional
 
 from odetam import DetaModel
+
+
+class UserMode(str, Enum):
+    SUPERUSER = 'superuser'
+    ADMIN = 'admin'
+    EMPLOYEE = 'employee'
+
+    @classmethod
+    def get_name(cls, mode: 'UserMode') -> str:
+        if mode == cls.SUPERUSER:
+            return 'Владелец'
+        elif mode == cls.ADMIN:
+            return 'Администратор'
+        elif mode == cls.EMPLOYEE:
+            return 'Сотрудник'
+        else:
+            return 'Неизвестный режим'
 
 
 class User(DetaModel):
     access_key: str
     name: str
-    mode: str
+    mode: UserMode
     area: Optional[str] = None
     chat_id: Optional[int]
 
@@ -16,7 +34,7 @@ class User(DetaModel):
         table_name = 'users'
 
     @classmethod
-    def register_user(cls, name: str, area: str, mode: Literal['superuser', 'admin', 'employee']) -> 'User':
+    def register_user(cls, name: str, area: str, mode: UserMode) -> 'User':
         access_key = choice(digits) + ''.join(choices(ascii_lowercase + digits, k=6))
 
         user = User(
@@ -37,5 +55,5 @@ class User(DetaModel):
             user.chat_id = chat_id
             user.save()
             return user
-        
+
         return None

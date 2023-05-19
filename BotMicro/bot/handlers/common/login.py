@@ -8,6 +8,7 @@ from bot.handlers import admin, employee, superuser
 from bot.handlers.utils import edit_message, get_init_message_id
 from bot.states.common import LoginState
 from models import User
+from models.user import UserMode
 
 router = Router()
 
@@ -34,11 +35,11 @@ async def access_key_handler(message: Message, state: FSMContext):
         await edit_message(message.chat.id, init_message_id, messages.WRONG_ACCESS_KEY)
         return
 
-    if user.mode == 'superuser':
+    if user.mode == UserMode.SUPERUSER:
         await superuser.greet(message.chat.id, init_message_id, user)
-    elif user.mode == 'admin':
+    elif user.mode == UserMode.ADMIN:
         await admin.greet(message.chat.id, init_message_id, user)
-    elif user.mode == 'employee':
+    elif user.mode == UserMode.EMPLOYEE:
         await employee.greet(message.chat.id, init_message_id, user)
 
     await state.clear()

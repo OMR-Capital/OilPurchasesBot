@@ -7,6 +7,7 @@ from bot import messages
 from bot.callbacks.superuser import (AccountsCallback, AccountsListCallback,
                                      UserInfoCallback)
 from models import User
+from models.user import UserMode
 
 router = Router()
 
@@ -15,7 +16,7 @@ router = Router()
 async def accounts_list_handler(query: CallbackQuery, message: Message, state: FSMContext):
     await state.clear()
 
-    users = User.query(User.mode.not_contains('superuser'))  # type: ignore
+    users = User.query(User.mode != UserMode.SUPERUSER)  # type: ignore
     users_list_kb = build_users_list_kb(users)
     await message.edit_text(
         text=messages.ACCOUNTS_LIST,
@@ -24,15 +25,10 @@ async def accounts_list_handler(query: CallbackQuery, message: Message, state: F
 
 
 def build_users_list_kb(users: list[User]) -> InlineKeyboardMarkup:
-    modes_table = {
-        'admin': 'Администратор',
-        'employee': 'Сотрудник',
-        'superuser': 'Владелец',
-    }
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(
-                text=f'{user.name} - {modes_table[user.mode]}',
+                text=f'{user.name} - {UserMode.get_name(user.mode)}',
                 callback_data=UserInfoCallback(key=user.key).pack()  # type: ignore
             )
         ] for user in users

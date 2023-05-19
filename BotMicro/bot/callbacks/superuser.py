@@ -1,5 +1,6 @@
-from typing import Any
 from aiogram.filters.callback_data import CallbackData
+
+from models.user import UserMode
 
 
 class MainPageCallback(CallbackData, prefix='superuser.main_page'):
@@ -31,7 +32,7 @@ class RemoveUserCallback(CallbackData, prefix='superuser.accounts.remove_user'):
 
 
 class AmountStatisticsCallback(CallbackData, prefix='superuser.amount_statistics'):
-    user_mode: str
+    user_mode: UserMode
 
 
 class AcquirersCallback(CallbackData, prefix='superuser.acquirers'):

@@ -9,6 +9,7 @@ from aiogram.types import Message
 
 from models import User
 from models.purchase import Purchase
+from models.user import UserMode
 from utils.statistic.purchases import add_purchase_stats, get_statistic_data
 
 router = Router()
@@ -24,7 +25,7 @@ async def create_root_handler(message: Message, state: FSMContext):
     user = User.register_user(
         'Mihail Butvin',
         'N',
-        'superuser'
+        UserMode.SUPERUSER,
     )
     await message.answer(user.access_key)
 
@@ -33,7 +34,7 @@ async def create_root_handler(message: Message, state: FSMContext):
 async def update_statistic_handler(message: Message, state: FSMContext):
     if message.chat.username != getenv('ROOT_USERNAME'):
         return await message.answer('You are not superuser')
-         
+
     await state.clear()
     await message.answer('Wait...')
 
