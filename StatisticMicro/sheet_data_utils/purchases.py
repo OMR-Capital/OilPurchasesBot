@@ -1,3 +1,4 @@
+from typing import Any
 from models.purchase import PurchaseStats
 from utils.datetime import datetime_to_str, get_month_name, get_weekday_name
 
@@ -24,7 +25,7 @@ PURCHASES_HEADER = [
 ]
 
 
-def build_purchase_row(purchase: PurchaseStats) -> list[str]:
+def build_purchase_row(purchase: PurchaseStats) -> list[Any]:
     return [
         purchase.key or '',
         purchase.contract_type,
@@ -32,13 +33,13 @@ def build_purchase_row(purchase: PurchaseStats) -> list[str]:
         datetime_to_str(purchase.create_time),
         purchase.creator,
         purchase.supplier,
-        f'{purchase.amount:.3f}',
-        f'{purchase.price:.3f}',
+        purchase.amount,
+        purchase.price,
         purchase.inn or '',
         "'" + purchase.card,
         purchase.area,
-        datetime_to_str(purchase.approve_time) if purchase.approve_time else '',
-        purchase.approver if purchase.approver else '',
+        datetime_to_str(purchase.approve_time) or '',
+        purchase.approver or '',
         str(purchase.create_time.day),
         get_weekday_name(purchase.create_time.weekday()),
         get_month_name(purchase.create_time.month),
