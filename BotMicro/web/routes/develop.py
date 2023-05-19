@@ -47,7 +47,7 @@ async def update_stats():
 
     results: list[Optional[dict[str, Any]]] = []
     for purchase in not_processed:
-        if time() - st > 15:
+        if time() - st > 17:
             return {'processed': len(results), 'left': len(purchases) - len(stats_keys), 'results': results}
 
         try:
