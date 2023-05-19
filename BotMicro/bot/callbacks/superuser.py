@@ -1,3 +1,4 @@
+from typing import Any
 from aiogram.filters.callback_data import CallbackData
 
 
@@ -51,4 +52,11 @@ class DeleteAcquirerCallback(CallbackData, prefix='superuser.acquirers.delete'):
 
 class ConfirmDeleteAcquirerCallback(CallbackData, prefix='superuser.acquirers.confirm_delete'):
     acquirer_key: str
-    
+
+
+class EditPurchaseCallback(CallbackData, prefix='superuser.edit_purchase'):
+    pass
+
+
+class EditSkipCallback(CallbackData, prefix='superuser.edit_purchase.skip'):
+    pass

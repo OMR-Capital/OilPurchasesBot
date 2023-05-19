@@ -6,7 +6,7 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
                            InlineKeyboardMarkup, Message)
 
 from bot import messages
-from bot.callbacks.superuser import AccountsCallback, AcquirersCallback, AmountStatisticsCallback, MainPageCallback
+from bot.callbacks.superuser import AccountsCallback, AcquirersCallback, AmountStatisticsCallback, EditPurchaseCallback, MainPageCallback
 
 router = Router()
 
@@ -23,6 +23,7 @@ async def open_main_page(message: Message):
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text='Управление аккаунтами', callback_data=AccountsCallback().pack())],
             [InlineKeyboardButton(text='Управление покупателями', callback_data=AcquirersCallback().pack())],
+            [InlineKeyboardButton(text='Редактировать заявку', callback_data=EditPurchaseCallback().pack())],
             [InlineKeyboardButton(text='Статистика объемов', callback_data=AmountStatisticsCallback(user_mode='superuser').pack())],
             [InlineKeyboardButton(text='Статистика', url=getenv('GOOGLE_SHEET_LINK', ''))],
         ])

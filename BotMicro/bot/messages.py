@@ -1,5 +1,7 @@
 from typing import Literal
 
+from models.purchase import Purchase
+
 START = 'Я помогу Вам управлять закупками!'
 
 ASK_ACCESS_KEY = 'Введите ключ доступа:'
@@ -37,6 +39,10 @@ ASK_ACQUIRER_NAME = 'Укажите наименование покупател�
 ASK_CONFIRM_DELETE_ACQUIRER = 'Вы уверены, что хотите удалить покупателя ?'
 SUCCESSFUL_CREATE_ACQUIRER = 'Новый покупатель добавлен: {name}'
 SUCCESSFUL_DELETE_ACQUIRER = 'Покупатель успешно удален.'
+
+ASK_EDIT_PURCHASE_KEY = 'Введите ключ заявки:'
+PURCHASE_NOT_FOUND = 'Заявка не найдена.'
+SUCCESSFUL_EDIT_PURCHASE = 'Заявка успешно изменена.'
 
 ASK_SUPPLIER = 'Укажите наименование поставщика:'
 ASK_CONTRACT_TYPE = 'Выберите тип договора:'
@@ -89,6 +95,20 @@ PURCHASE_APPROVED = '''
 <b>Администратор</b>: {approver}
 
 ''' + PURCHASE_BASE
+
+
+def edit_purchase_ask(purchase: Purchase, question: str) -> str:
+    purchase_info = PURCHASE_BASE.format(
+        contract_type=purchase.contract_type,
+        client_type=purchase.client_type,
+        supplier=purchase.supplier,
+        amount=purchase.amount,
+        price=purchase.price,
+        card=purchase.card,
+        bank=purchase.bank
+    )
+    return f'{purchase_info}--------\n\n{question}'
+
 
 SUCCESSFUL_MAKE_STATISTIC = 'Отчет успешно создан.'
 

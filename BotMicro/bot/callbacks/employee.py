@@ -41,7 +41,7 @@ class NewDispatchCallback(CallbackData, prefix='new_dis'):
 
 class AcquirerCallback(CallbackData, prefix='dis.acquirer'):
     acquirer_key: str
-    
+
 
 class ConfirmDispatchCallback(CallbackData, prefix='dis.conf'):
     pass
