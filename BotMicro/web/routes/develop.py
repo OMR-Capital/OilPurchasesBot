@@ -5,6 +5,8 @@ from fastapi import APIRouter
 from models.purchase import Purchase
 
 from models.user import User
+from statistic.purchases_statistic import update_purchases_statistic
+from utils.logging import log
 from utils.micro_api.requests import request_micro
 from utils.statistic.purchases import add_purchase_stats
 
@@ -24,6 +26,17 @@ async def update_purchases():
     logger.warning('Test')
     purchases = Purchase.get_all()
     Purchase.put_many(purchases)
+
+
+@develop_router.post('/update_purchases_statistic')
+async def update_sheets():
+    st = time()
+    try:
+        update_purchases_statistic()
+    except Exception as e:
+        log({'error': e})
+
+    return {'time': time() - st}
 
 
 @develop_router.post('/update_stats')
