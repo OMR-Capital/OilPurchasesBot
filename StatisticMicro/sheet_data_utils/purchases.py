@@ -3,7 +3,7 @@ from models.purchase import PurchaseStats
 from utils.datetime import datetime_to_str, get_month_name, get_weekday_name
 
 
-CREATE_TIME_COLUMN = 4 # for sorting in GoogleSheets
+CREATE_TIME_COLUMN = 4  # for sorting in GoogleSheets
 
 PURCHASES_HEADER = [
     'ID',

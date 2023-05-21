@@ -29,6 +29,9 @@ def get_worksheet(table_name: str, worksheet_name: str) -> Optional[Worksheet]:
 def update_header(worksheet: Worksheet, header_data: list[Any]):
     """Update first line of worksheet with header data"""
 
+    if worksheet.row_count <= 1:
+        worksheet.add_rows(2)
+
     worksheet.update(
         get_cells_range(1, 1, len(header_data), 1),
         [header_data],
@@ -75,4 +78,3 @@ def sort_by_column(worksheet: Worksheet, column: int, reverse: bool = False):
 
     # A2:ZZ99999 used to skip first frozen row
     worksheet.sort((column, 'asc' if not reverse else 'des'), range='A2:ZZ99999')
-                                      

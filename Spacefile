@@ -35,8 +35,10 @@ micros:
       env:
         - name: TABLE_NAME
           description: Name of google sheet
-        - name: PURCHASES_WORKSHEET_NAME
-          description: Name of worksheet with purchases data
+        - name: STATS_PURCHASES_RAW_WORKSHEET
+          description: Name of worksheet with unsorted purchases
+        - name: STATS_PURCHASES_SORTED_WORKSHEET
+          description: Name of worksheet with sorted purchases
 
     path: statistic
     public_routes:
