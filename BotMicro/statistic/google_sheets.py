@@ -46,8 +46,13 @@ def get_worksheet(sheet: Spreadsheet, worksheet_name: str) -> Worksheet:
     return worksheet
 
 
-def update_worksheet(worksheet: Worksheet, table_data: TableData, formats: TableFormats) -> None:
-    worksheet.clear()
-    worksheet.format('A1:Z10000', EMPTY_FORMAT)
+def update_worksheet(worksheet: Worksheet, table_data: TableData, formats: TableFormats, cells_range: Optional[list[str]] = None) -> None:
+    if cells_range is None:
+        worksheet.clear()
+        worksheet.format('A1:Z10000', EMPTY_FORMAT)
+    else:
+        worksheet.batch_clear(cells_range)
+        worksheet.batch_format([{'range': cr, 'format': EMPTY_FORMAT} for cr in cells_range])
+
     worksheet.update(table_data)
     worksheet.batch_format(formats)
