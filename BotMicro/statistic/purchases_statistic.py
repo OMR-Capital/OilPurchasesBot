@@ -47,10 +47,10 @@ MONTH_STATS_FORMAT = {
 
 def get_purchase_statistic_row(purchase: Purchase, users: dict[str, User]) -> list[Any]:
     creator = users.get(purchase.creator)
-    creator_name = creator.name if creator else 'Error'
+    creator_name = creator.name if creator else ''
 
     approver = users.get(purchase.approver) if purchase.approver else None
-    approver_name = approver.name if approver else 'Error'
+    approver_name = approver.name if approver else ''
 
     create_time = get_formatted_time(purchase.create_time)
 
