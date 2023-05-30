@@ -2,6 +2,8 @@ from typing import Literal
 
 from aiogram.filters.callback_data import CallbackData
 
+from models.purchase import ClientType, ContractType, Unit
+
 
 class MainPageCallback(CallbackData, prefix='employee.main_page'):
     pass
@@ -12,15 +14,15 @@ class NewPurchaseCallback(CallbackData, prefix='employee.new_purchase'):
 
 
 class UnitCallback(CallbackData, prefix='employee.new_purchase.unit'):
-    unit: Literal['liter', 'kg']
+    unit: Unit
 
 
 class ContractTypeCallback(CallbackData, prefix='employee.new_purchase.contract_type'):
-    cashless: bool
+    contract_type: ContractType
 
 
 class ClientTypeCallback(CallbackData, prefix='employee.new_purchase.contract_type'):
-    from_manager: bool
+    client_type: ClientType
 
 
 class HidePurchaseCallback(CallbackData, prefix='employee.hide_purchase'):
@@ -41,7 +43,7 @@ class NewDispatchCallback(CallbackData, prefix='new_dis'):
 
 class AcquirerCallback(CallbackData, prefix='dis.acquirer'):
     acquirer_key: str
-    
+
 
 class ConfirmDispatchCallback(CallbackData, prefix='dis.conf'):
     pass

@@ -8,18 +8,19 @@ from bot.callbacks.superuser import (AccountsCallback, NewAdminCallback,
                                      NewEmployeeCallback)
 from bot.states.superuser import NewUserState
 from models import User
+from models.user import UserMode
 
 router = Router()
 
 
 @router.callback_query(NewAdminCallback.filter())
 async def new_admin_handler(query: CallbackQuery, message: Message, state: FSMContext):
-    await new_user_handler(query, message, state, 'admin')
+    await new_user_handler(query, message, state, UserMode.ADMIN)
 
 
 @router.callback_query(NewEmployeeCallback.filter())
 async def new_employee_handler(query: CallbackQuery, message: Message, state: FSMContext):
-    await new_user_handler(query, message, state, 'employee')
+    await new_user_handler(query, message, state, UserMode.EMPLOYEE)
 
 
 async def new_user_handler(query: CallbackQuery, message: Message, state: FSMContext, mode: str):

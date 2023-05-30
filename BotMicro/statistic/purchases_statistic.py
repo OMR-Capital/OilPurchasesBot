@@ -2,10 +2,9 @@ from os import getenv
 from typing import Any
 
 from models import Purchase, User
-from odetam.exceptions import ItemNotFound
 from statistic.google_sheets import get_sheet, get_worksheet, update_worksheet
 from statistic.types import TableData, TableFormats
-from statistic.utils import get_formatted_time, get_rows_range
+from statistic.utils import get_cell_literal, get_formatted_time, get_rows_range
 
 
 TABLE_HEAD = [
@@ -19,11 +18,11 @@ TABLE_HEAD = [
     'Поставщик',
     'Объем (в литрах)',
     'Цена (за литр)',
-    'ИНН',
     'Счет оплаты',
     'Регион',
     'Время одобрения',
     'Одобривший заявку',
+    'Ключ'
 ]
 TITLE_FORMAT = {
     'textFormat': {'bold': True, 'fontSize': 10},
@@ -46,21 +45,12 @@ MONTH_STATS_FORMAT = {
 }
 
 
-def get_purchase_statistic_row(purchase: Purchase) -> list[Any]:
-    try:
-        creator = User.get(purchase.creator)  # type: ignore
-        creator_name = creator.name
-    except ItemNotFound:
-        creator_name = 'Error'
+def get_purchase_statistic_row(purchase: Purchase, users: dict[str, User]) -> list[Any]:
+    creator = users.get(purchase.creator)
+    creator_name = creator.name if creator else ''
 
-    if purchase.approver:
-        try:
-            approver = User.get(purchase.approver)  # type: ignore
-            approver_name = approver.name
-        except ItemNotFound:
-            approver_name = 'Error'
-    else:
-        approver_name = ''
+    approver = users.get(purchase.approver) if purchase.approver else None
+    approver_name = approver.name if approver else ''
 
     create_time = get_formatted_time(purchase.create_time)
 
@@ -68,9 +58,6 @@ def get_purchase_statistic_row(purchase: Purchase) -> list[Any]:
         approve_time = get_formatted_time(purchase.approve_time)
     else:
         approve_time = ''
-
-    if purchase.inn:
-        purchase.inn = "'" + purchase.inn
 
     if purchase.card:
         purchase.card = "'" + purchase.card
@@ -84,11 +71,11 @@ def get_purchase_statistic_row(purchase: Purchase) -> list[Any]:
         purchase.supplier,
         purchase.amount,
         purchase.price,
-        purchase.inn,
         purchase.card,
         purchase.area or '',
         approve_time,
         approver_name,
+        purchase.key
     ]
 
 
@@ -97,7 +84,8 @@ def get_day_statistic_row(purchases: list[Purchase]) -> list[Any]:
         return []
 
     total_amount = sum(purchase.amount for purchase in purchases)
-    total_price = sum(purchase.amount * purchase.price for purchase in purchases)
+    total_price = sum(purchase.amount *
+                      purchase.price for purchase in purchases)
     date = purchases[-1].create_time.strftime('%A %d.%m.%Y')
     return [f'{date}'.upper(), total_amount, total_price]
 
@@ -107,7 +95,8 @@ def get_week_statistic_row(purchases: list[Purchase]) -> list[Any]:
         return []
 
     total_amount = sum(purchase.amount for purchase in purchases)
-    total_price = sum(purchase.amount * purchase.price for purchase in purchases)
+    total_price = sum(purchase.amount *
+                      purchase.price for purchase in purchases)
     begin_date = purchases[-1].create_time.strftime('%d.%m.%Y')
     end_date = purchases[0].create_time.strftime('%d.%m.%Y')
     return [f'неделя {begin_date} - {end_date}'.upper(), total_amount, total_price]
@@ -118,13 +107,14 @@ def get_month_statistic_row(purchases: list[Purchase]) -> list[Any]:
         return []
 
     total_amount = sum(purchase.amount for purchase in purchases)
-    total_price = sum(purchase.amount * purchase.price for purchase in purchases)
+    total_price = sum(purchase.amount *
+                      purchase.price for purchase in purchases)
     begin_date = purchases[-1].create_time.strftime('%B %d.%m.%Y')
     end_date = purchases[0].create_time.strftime('%d.%m.%Y')
     return [f'{begin_date} - {end_date}'.upper(), total_amount, total_price]
 
 
-def get_purchases_statistic(purchases: list[Purchase]) -> tuple[TableData, TableFormats]:
+def get_purchases_statistic(purchases: list[Purchase], users: dict[str, User]) -> tuple[TableData, TableFormats]:
     purchases.sort(key=lambda purchase: purchase.create_time)
 
     day_purchases: list[Purchase] = []
@@ -139,7 +129,7 @@ def get_purchases_statistic(purchases: list[Purchase]) -> tuple[TableData, Table
         purchase = purchases[i]
         next_purchase = purchases[i + 1] if i + 1 < len(purchases) else None
 
-        table_data.append(get_purchase_statistic_row(purchase))
+        table_data.append(get_purchase_statistic_row(purchase, users))
         day_purchases.append(purchase)
         week_purchases.append(purchase)
         month_purchases.append(purchase)
@@ -167,7 +157,8 @@ def get_purchases_statistic(purchases: list[Purchase]) -> tuple[TableData, Table
     table_data.reverse()
 
     title_formats = [
-        {'range': get_rows_range([0], len(TABLE_HEAD))[0], 'format': TITLE_FORMAT}
+        {'range': get_rows_range([0], len(TABLE_HEAD))[
+            0], 'format': TITLE_FORMAT}
     ]
     day_stats_formats = [
         {'range': row_range, 'format': DAY_STATS_FORMAT}
@@ -182,11 +173,17 @@ def get_purchases_statistic(purchases: list[Purchase]) -> tuple[TableData, Table
         for row_range in get_rows_range(month_rows, len(TABLE_HEAD))
     ]
 
-    formats = title_formats + day_stats_formats + week_stats_formats + month_stats_formats
+    formats = title_formats + day_stats_formats + \
+        week_stats_formats + month_stats_formats
     return table_data, formats
 
 
 def update_purchases_statistic() -> None:
+    users = {
+        user.key: user
+        for user in User.get_all() if user.key
+    }
+
     sheet_name = getenv('GOOGLE_SHEET_NAME')
     if not sheet_name:
         raise Exception('GOOGLE_SHEET_NAME not specified')
@@ -202,21 +199,18 @@ def update_purchases_statistic() -> None:
     if not purchases_worksheet:
         raise Exception('Cannot get worksheet')
 
-    table_data, formats = get_purchases_statistic(purchases)
-    update_worksheet(purchases_worksheet, table_data, formats)
-    # for each user
-    for user_key in set(purchase.creator for purchase in purchases):
-        try:
-            creator = User.get(user_key)  # type: ignore
-            creator_name = creator.name
-        except ItemNotFound:
-            creator_name = 'Error'
+    stats_range = get_cell_literal(0, 0) + ':' + get_cell_literal(1000, len(TABLE_HEAD))
 
-        user_purchases = [purchase for purchase in purchases if purchase.creator == user_key]
+    table_data, formats = get_purchases_statistic(purchases, users)
+    update_worksheet(purchases_worksheet, table_data, formats, [stats_range])
+    # for each user
+    for creator_key in set(purchase.creator for purchase in purchases):
+        creator_name = users[creator_key].name
+        user_purchases = [purchase for purchase in purchases if purchase.creator == creator_key]
 
         user_purchases_worksheet = get_worksheet(sheet, creator_name)
         if not user_purchases_worksheet:
             return None
 
-        table_data, formats = get_purchases_statistic(user_purchases)
-        update_worksheet(user_purchases_worksheet, table_data, formats)
+        table_data, formats = get_purchases_statistic(user_purchases, users)
+        update_worksheet(user_purchases_worksheet, table_data, formats, [stats_range])

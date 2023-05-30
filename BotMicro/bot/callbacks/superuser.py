@@ -1,5 +1,7 @@
 from aiogram.filters.callback_data import CallbackData
 
+from models.user import UserMode
+
 
 class MainPageCallback(CallbackData, prefix='superuser.main_page'):
     pass
@@ -30,7 +32,7 @@ class RemoveUserCallback(CallbackData, prefix='superuser.accounts.remove_user'):
 
 
 class AmountStatisticsCallback(CallbackData, prefix='superuser.amount_statistics'):
-    user_mode: str
+    user_mode: UserMode
 
 
 class AcquirersCallback(CallbackData, prefix='superuser.acquirers'):
@@ -51,4 +53,11 @@ class DeleteAcquirerCallback(CallbackData, prefix='superuser.acquirers.delete'):
 
 class ConfirmDeleteAcquirerCallback(CallbackData, prefix='superuser.acquirers.confirm_delete'):
     acquirer_key: str
-    
+
+
+class EditPurchaseCallback(CallbackData, prefix='superuser.edit_purchase'):
+    pass
+
+
+class EditSkipCallback(CallbackData, prefix='superuser.edit_purchase.skip'):
+    pass

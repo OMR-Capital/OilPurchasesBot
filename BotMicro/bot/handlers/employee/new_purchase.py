@@ -10,6 +10,7 @@ from bot.callbacks.employee import (ClientTypeCallback, ContractTypeCallback,
 from bot.handlers.utils import edit_message, get_init_message_id
 from bot.handlers.utils.purchases import new_purchase
 from bot.states.employee import NewPurchaseState
+from models.purchase import ClientType, ContractType, Unit
 from utils.statistic.purchases import add_purchase_stats
 
 router = Router()
@@ -26,8 +27,8 @@ async def new_purchase_handler(query: CallbackQuery, message: Message, state: FS
         messages.ASK_CONTRACT_TYPE,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [
-                InlineKeyboardButton(text='Безнал', callback_data=ContractTypeCallback(cashless=True).pack()),
-                InlineKeyboardButton(text='Нал', callback_data=ContractTypeCallback(cashless=False).pack())
+                InlineKeyboardButton(text='Безнал', callback_data=ContractTypeCallback(contract_type=ContractType.CASHLESS).pack()),
+                InlineKeyboardButton(text='Нал', callback_data=ContractTypeCallback(contract_type=ContractType.CASH).pack())
             ],
         ] + cancel_kb.inline_keyboard
         )
@@ -42,13 +43,13 @@ async def contract_type_handler(query: CallbackQuery, message: Message, callback
         messages.ASK_CLIENT_TYPE,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [
-                InlineKeyboardButton(text='Менеджерский', callback_data=ClientTypeCallback(from_manager=True).pack()),
-                InlineKeyboardButton(text='Собственный', callback_data=ClientTypeCallback(from_manager=False).pack())
+                InlineKeyboardButton(text='Менеджерский', callback_data=ClientTypeCallback(client_type=ClientType.MANAGER).pack()),
+                InlineKeyboardButton(text='Собственный', callback_data=ClientTypeCallback(client_type=ClientType.OWN).pack())
             ],
         ] + cancel_kb.inline_keyboard
         )
     )
-    await state.update_data(cashless=callback_data.cashless)
+    await state.update_data(contract_type=callback_data.contract_type)
     await state.set_state(NewPurchaseState.client_type)
 
 
@@ -59,7 +60,7 @@ async def client_type_handler(query: CallbackQuery, message: Message, callback_d
         reply_markup=cancel_kb
     )
 
-    await state.update_data(from_manager=callback_data.from_manager)
+    await state.update_data(client_type=callback_data.client_type)
     await state.set_state(NewPurchaseState.supplier)
 
 
@@ -80,8 +81,8 @@ async def supplier_handler(message: Message, state: FSMContext):
         messages.ASK_UNIT,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [
-                InlineKeyboardButton(text='Литры', callback_data=UnitCallback(unit='liter').pack()),
-                InlineKeyboardButton(text='Килограммы', callback_data=UnitCallback(unit='kg').pack())
+                InlineKeyboardButton(text='Литры', callback_data=UnitCallback(unit=Unit.LITERS).pack()),
+                InlineKeyboardButton(text='Килограммы', callback_data=UnitCallback(unit=Unit.KG).pack())
             ],
         ] + cancel_kb.inline_keyboard)
     )
@@ -100,7 +101,7 @@ async def unit_handler(query: CallbackQuery, message: Message, callback_data: Un
 
 
 @router.message(NewPurchaseState.amount, F.text.regexp(r'^\d+\.?\d*$'))
-async def amount_handler(message: Message, state: FSMContext):
+async def amount_handler(message: Message, bot: Bot, state: FSMContext):
     await message.delete()
 
     init_message_id = await get_init_message_id(state)
@@ -111,12 +112,6 @@ async def amount_handler(message: Message, state: FSMContext):
     await state.update_data(amount=amount)
 
     data = await state.get_data()
-    if data.get('cashless'):
-        await edit_message(message.chat.id, init_message_id, messages.ASK_INN, cancel_kb)
-        await state.set_state(NewPurchaseState.inn)
-        return
-
-    await state.update_data(inn='')
     await edit_message(
         message.chat.id,
         init_message_id,
@@ -137,20 +132,12 @@ async def wrong_amount_handler(message: Message, state: FSMContext):
     await edit_message(message.chat.id, init_message_id, messages.WRONG_INTEGER, cancel_kb)
 
 
-@router.message(NewPurchaseState.inn, F.text)
-async def inn_handler(message: Message, bot: Bot, state: FSMContext):
-    await message.delete()
-
-    inn = message.text or ''
-    await state.update_data(inn=inn, price=0, card='', bank='')
-    await create_new_purchase(message, bot, state)
-
-
 @router.message(NewPurchaseState.price, F.text.regexp(r'^\d+\.?\d*$'))
-async def price_handler(message: Message, state: FSMContext):
+async def price_handler(message: Message, bot: Bot, state: FSMContext):
     await message.delete()
 
     price = message.text or ''
+    await state.update_data(price=price)
 
     init_message_id = await get_init_message_id(state)
     if not init_message_id:
@@ -158,7 +145,12 @@ async def price_handler(message: Message, state: FSMContext):
 
     await edit_message(message.chat.id, init_message_id, messages.ASK_CARD, cancel_kb)
 
-    await state.update_data(price=price)
+    data = await state.get_data()
+    if data.get('cashless'):
+        await state.update_data(card='', bank='')
+        await create_new_purchase(message, bot, state)
+        return
+
     await state.set_state(NewPurchaseState.card)
 
 
@@ -216,7 +208,6 @@ async def create_new_purchase(message: Message, bot: Bot, state: FSMContext):
             supplier=purchase.supplier,
             amount=purchase.amount,
             price=purchase.price,
-            inn=purchase.inn,
             card=purchase.card,
             bank=purchase.bank,
         ),

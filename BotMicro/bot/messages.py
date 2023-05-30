@@ -1,4 +1,4 @@
-from typing import Literal
+from models.purchase import Purchase, Unit
 
 START = 'Я помогу Вам управлять закупками!'
 
@@ -38,6 +38,10 @@ ASK_CONFIRM_DELETE_ACQUIRER = 'Вы уверены, что хотите удал
 SUCCESSFUL_CREATE_ACQUIRER = 'Новый покупатель добавлен: {name}'
 SUCCESSFUL_DELETE_ACQUIRER = 'Покупатель успешно удален.'
 
+ASK_EDIT_PURCHASE_KEY = 'Введите ключ заявки:'
+PURCHASE_NOT_FOUND = 'Заявка не найдена.'
+SUCCESSFUL_EDIT_PURCHASE = 'Заявка успешно изменена.'
+
 ASK_SUPPLIER = 'Укажите наименование поставщика:'
 ASK_CONTRACT_TYPE = 'Выберите тип договора:'
 ASK_CLIENT_TYPE = 'Выберите принадлежность клиента:'
@@ -45,13 +49,13 @@ ASK_UNIT = 'Выберете единицу измерения:'
 ASK_INN = 'Укажите ИНН клиента:'
 
 
-def ask_amount(unit: Literal['liter', 'kg']) -> str:
-    unit_name = 'литрах' if unit == 'liter' else 'килограммах'
+def ask_amount(unit: Unit) -> str:
+    unit_name = 'литрах' if unit == Unit.LITERS else 'килограммах'
     return f'Укажите объем вывезенного масла в {unit_name}:'
 
 
-def ask_price(unit: Literal['liter', 'kg']) -> str:
-    unit_name = 'литр' if unit == 'liter' else 'килограмм'
+def ask_price(unit: Unit) -> str:
+    unit_name = 'литр' if unit == Unit.LITERS else 'килограмм'
     return f'Укажите цену за {unit_name}:'
 
 
@@ -60,15 +64,13 @@ ASK_BANK = 'Укажите наименование банка оплаты:'
 WRONG_INTEGER = 'Значение должно быть числом.\nПопробуйте снова:'
 
 
-PURCHASE_BASE = ''' 
+PURCHASE_BASE = '''
 <b>Тип договора</b>: {contract_type}
 <b>Клиент</b>: {client_type}
 <b>Поставщик</b>: {supplier}
 <b>Объем (литров)</b>: {amount:.3f}
 <b>Цена (за литр)</b>: {price:.3f}
-<b>ИНН</b>: 
-<code>{inn}</code>
-<b>Реквизиты для оплаты</b>: 
+<b>Реквизиты для оплаты</b>:
 <code>{card}</code>
 <b>Банк</b>: {bank}
 '''
@@ -91,6 +93,20 @@ PURCHASE_APPROVED = '''
 <b>Администратор</b>: {approver}
 
 ''' + PURCHASE_BASE
+
+
+def edit_purchase_ask(purchase: Purchase, question: str) -> str:
+    purchase_info = PURCHASE_BASE.format(
+        contract_type=purchase.contract_type,
+        client_type=purchase.client_type,
+        supplier=purchase.supplier,
+        amount=purchase.amount,
+        price=purchase.price,
+        card=purchase.card,
+        bank=purchase.bank
+    )
+    return f'{purchase_info}--------\n\n{question}'
+
 
 SUCCESSFUL_MAKE_STATISTIC = 'Отчет успешно создан.'
 

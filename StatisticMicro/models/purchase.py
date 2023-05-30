@@ -13,7 +13,7 @@ class PurchaseStats(AsyncDetaModel):
     contract_type: str
     client_type: str
     supplier: str
-    inn: str
+    inn: Optional[str] = None  # deprecated
     amount: float
     price: float
     card: str

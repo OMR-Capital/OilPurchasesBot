@@ -8,7 +8,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from bot import messages
 from bot.callbacks.employee import HideDispatchCallback
 from models.dispatch import Dispatch
-from models.user import User
+from models.user import User, UserMode
 from utils.datetime import MSC_TZ
 
 
@@ -35,7 +35,7 @@ async def new_dispatch(message: Message, bot: Bot, state: FSMContext) -> Optiona
 
 
 async def spread_dispatch(dispatch: Dispatch, creator: User, acquirer_name: str, bot: Bot):
-    admins = User.query((User.mode == 'admin') | (User.mode == 'superuser'))  # type: ignore
+    admins = User.query((User.mode == UserMode.ADMIN) | (User.mode == UserMode.SUPERUSER))  # type: ignore
     for admin in admins:
         try:
             create_time = dispatch.create_time.astimezone(MSC_TZ)

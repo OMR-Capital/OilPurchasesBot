@@ -31,5 +31,4 @@ async def request_micro(method: str, micro: str, route: str, data: Optional[dict
             get_micro_route_url(micro, route),
             json=data,
         ) as response:
-            response = await response.json()
             return await response.json()

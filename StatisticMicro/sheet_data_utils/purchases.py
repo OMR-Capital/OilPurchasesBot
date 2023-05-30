@@ -1,8 +1,9 @@
+from typing import Any
 from models.purchase import PurchaseStats
-from utils.datetime import datetime_to_str
+from utils.datetime import datetime_to_str, get_month_name, get_weekday_name
 
 
-CREATE_TIME_COLUMN = 4 # for sorting in GoogleSheets
+CREATE_TIME_COLUMN = 4  # for sorting in GoogleSheets
 
 PURCHASES_HEADER = [
     'ID',
@@ -18,10 +19,13 @@ PURCHASES_HEADER = [
     'Регион',
     'Время одобрения',
     'Одобривший заявку',
+    'День',
+    'Неделя',
+    'Месяц',
 ]
 
 
-def build_purchase_row(purchase: PurchaseStats) -> list[str]:
+def build_purchase_row(purchase: PurchaseStats) -> list[Any]:
     return [
         purchase.key or '',
         purchase.contract_type,
@@ -29,11 +33,14 @@ def build_purchase_row(purchase: PurchaseStats) -> list[str]:
         datetime_to_str(purchase.create_time),
         purchase.creator,
         purchase.supplier,
-        f'{purchase.amount:.3f}',
-        f'{purchase.price:.3f}',
-        purchase.inn,
-        purchase.card,
+        purchase.amount,
+        purchase.price,
+        purchase.inn or '',
+        "'" + purchase.card,
         purchase.area,
         datetime_to_str(purchase.approve_time) if purchase.approve_time else '',
-        purchase.approver if purchase.approver else '',
+        purchase.approver or '',
+        str(purchase.create_time.day),
+        get_weekday_name(purchase.create_time.weekday()),
+        get_month_name(purchase.create_time.month),
     ]
