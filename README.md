@@ -1,48 +1,73 @@
-# Oil Purchases Bot
+## Описание
 
-## Description
+Бот предназначен для управления закупками отработанного масла.
 
-That Telegram bot helps manage purchases, dispatches, and sailing of waste oil for retail companies. It is designed to automate the process of purchasing waste oil, dispatching it to the company's warehouse, and sailing it to the customer. The bot is designed to be used by employees of the company, who can create purchase applications and dispatches, and by the company's management, who can approve purchases and set up the sailing of oil dispatches.
+В боте есть следующие роли:
+1. Сотрудник (employee) - может создавать заявки на закупки и отгрузки масла, уведомлять о заправке
+2. Администратор (admin) - подтверждает заявки на закупку, имеет доступ к статистике закупок
+3. Супер-пользователь (superuser) - имеет доступ к функционалу администраторов, а также может создавать и удалять аккаунты
 
-The bot supports three different roles with unique functions and permissions:
-1. The Superuser creates and deletes accounts and has access to administrative functionalities. 
-2. The Admin views purchase statistics and approves purchases made by employees and sets up the sailing of oil dispatches. 
-3. The Employee creates new purchase applications and dispatches, ensuring the process is executed seamlessly.
+## Функционал
 
-To access the bot's functionalities, users need to call the login form using the /start command and then login with a specific access key, ensuring authorized access.
+### 1. Вход
 
-This Telegram bot is an effective solution for managing the purchases, dispatching, and sailing of waste oil for retail companies. Its streamlined functionalities and user-friendly interface can improve the efficiency and productivity of businesses, leading to better profits and growth.
+В начале диалога бот спрашивает ключ доступа пользователя.
+Доступ к списку всех ключей доступа есть у супер-пользователя.
 
-The bot is an example of how Telegram bots can solve complex business tasks, highlighting the benefits of using such solutions. It can serve as a starting point for building customized solutions, saving time and effort in development.
+### 2. Создание заявки на закупку
 
-The bot is hosted on the [Deta Space](https://deta.space/) cloud platform, designed for building, deploying, and scaling web applications and APIs. Deta Space provides developers with powerful tools and services, such as automated deployment, version control, and performance monitoring, making it easier to build and manage complex applications.
+Сотрудника создает заявку на закупку масла.
 
+В заявке указывается регион, тип клиента, тип договора, объем и единицы измерения, инн и реквизиты для оплаты
 
-## Deployment
+После успешного заполнения формы заявка приходит всем администраторам и попадает в статистику.
+Под сообщение у администратора есть кнопка подтверждения заявки.
 
-### Prerequisites
-Before deploying the Telegram bot, ensure the following prerequisites are met:
+После подтверждения заявки сотруднику приходит сообщение, и запись о заявке в статистике помечается как подтвержденная
 
-1. Create a Telegram bot via [@BotFather](https://t.me/BotFather) and obtain a token.
-2. Create a new or use an existing Google Sheet for purchases statistics.
-3. Create a service account for Google Sheet and obtain the credentials file ([see](https://console.cloud.google.com)).
+### 3. Создание заявки на отгрузку
 
-### Deploy
-To deploy the Telegram bot, follow these steps:
+Аналогично закупке
 
-1. Create a developer account on [Deta Space](https://deta.space/).
-2. Install the [Space CLI](https://deta.space/docs/en/basics/cli).
-3. Clone the project using the command `git clone https://github.com/OMR-Capital/OilPurchasesBot.git`.
-4. Add the credentials file to the project directory.
-5. In the project directory, run `space new` and follow the instructions.
-6. Open the project in the [Builder](https://deta.space/builder).
-7. In the `Configuration` tab, specify the settings with your Telegram bot token and Google Sheet data.
-8. Set up the Telegram webhook (refer to the [Telegram docs](https://core.telegram.org/bots/api#setwebhook)) with the URL from `Builder` and token from `BotFather`. Note: You must specify `TELEGRAM_SECRET` in the `Configuration` tab of `Builder` before setting up the webhook and use it in the webhook.
-9. Type `/start` in the Telegram chat with your bot and enjoy!
+### 4. Заправка
 
-> To get access to the first superuser, use the `/create_root` command from the account specified in `ROOT_USERNAME`.
+Сотрудник может отмечать заправку своего транспорта и ее стоимость.
+Данные о заправках также хранятся в статистике.
 
-## Thanks
+### 5. Управление аккаунтами
 
-This project was created with [Deta Space](https://deta.space/), [ODetaM](https://github.com/rickh94/ODetaM) and [aiogram](https://github.com/aiogram/aiogram) 
+Супер-пользователь может создавать и удалять аккаунты.
 
+При создании аккаунта генерируется ключ доступа. Этот ключ необходимо передать сотруднику для доступа к боту.
+
+### 6. Статистика
+
+Статистика хранится в Google таблице.
+
+Страницы Raw и Sorted - служебные, они заполняются ботом.
+
+Остальные страницы содержат обработанную информацию о закупках, заправках, премии, информацию по каждому пользователю.
+
+Страницы Премии2 не обновляется автоматически из-за проблем с формулой в Google Sheets, поэтому ее приходилось периодически обновлять в ручную.
+Возможно сейчас формулы Google Sheets уже позволяют это исправить, или можно целиком генерировать отчеты кодом и отказаться от формул.
+
+## Архитектура
+
+Бот изначально разрабатывался для работы на платформе Deta Space, поэтому весь код рассчитан на ее инфраструктуру.
+
+В боте есть два "микросервиса" (в терминах Deta Space): BotMicro для управления ботом и StatisticsMicro для формирования статистики в Google Sheets.
+
+Так как обновление статистики занимало какое-то время, а каждый вызов сервиса в Deta Space должен был укладываться в минуту,
+она была вынесена в отдельный сервис (StatisticsMicro) и запускалась по расписанию.
+Чтобы усложнить жизнь, StatisticsMicro еще и копировал данные из BotMicro в собственную базу, общаясь с ним через API.
+Пре переделке бота это место можно сильно упростить, избавившись от StatisticsMicro и просто обновляя статистику после соответствующих событий.
+
+Сервисы использовали базу данных Deta Base через ORM odetam. Структуру всех таблиц можно найти в директории `BotMicro/models` и `StatisticsMicro/models`
+
+## Требуемые доработки
+
+- Переписать работу с данными с Deta Base на любое другое хранилище
+- Переписать обновление статистики - либо целиком отказаться от StatisticsMicro и внести его функционал в основной сервис, или переписать запуск по рассписанию Deta на какой-нибудь cron
+- По возможности исправить обновление страницы "Премии2"
+- Задеплоить на каком-нибудь сервере, можно при необходимости переписать вебхуки на лонг поллинг, чтобы ssl не настраивать
+- Восстановить данные: бэкапа нет, но данных из Google таблицы достаточно для восстановления истории закупок
